@@ -15,7 +15,7 @@ import sh.wu.james.common.statemachine.preprocessor.PreProcessor;
 
 @Component
 @Scope("prototype")
-public class GenericStateImpl<T, P, S> implements GenericState<T, P, S> {
+public class GenericStateMachineImpl<T, P, S> implements GenericStateMachine<T, P, S> {
 	private StateFactory<T, P, S> factory;
 
 	public void setFactory(StateFactory<T, P, S> factory) {

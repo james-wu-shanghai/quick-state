@@ -17,7 +17,7 @@ import sh.wu.james.common.statemachine.preprocessor.PreProcessor;
  * @param <P>
  * @param <S>
  */
-public interface GenericState<T, P, S> {
+public interface GenericStateMachine<T, P, S> {
 
 	public List<StateListener<T, P, S>> getListeners();
 

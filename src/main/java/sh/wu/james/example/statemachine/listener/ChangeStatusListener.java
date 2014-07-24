@@ -4,7 +4,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import sh.wu.james.common.statemachine.GenericState;
+import sh.wu.james.common.statemachine.GenericStateMachine;
 import sh.wu.james.common.statemachine.listener.StateListener;
 import sh.wu.james.example.dao.HelloworldDAO;
 import sh.wu.james.example.dto.HelloworldDTO;
@@ -18,7 +18,7 @@ public class ChangeStatusListener implements StateListener<BizOperations, Hellow
     private HelloworldDAO helloworldDao;
 
     @Override
-    public void onEvent(GenericState<BizOperations, HelloworldDTO, HelloworldStatus> state, String evtType) {
+    public void onEvent(GenericStateMachine<BizOperations, HelloworldDTO, HelloworldStatus> state, String evtType) {
 
         if (StateEventType.STATUS_CHANGE.name().equals(evtType)) {
             HelloworldDTO req = state.getPayload();

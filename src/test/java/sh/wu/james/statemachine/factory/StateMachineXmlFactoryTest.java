@@ -11,7 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 
-import sh.wu.james.common.statemachine.GenericState;
+import sh.wu.james.common.statemachine.GenericStateMachine;
 import sh.wu.james.common.statemachine.factory.StateMachineXmlFactory;
 import sh.wu.james.common.utils.ReflectionUtil;
 import sh.wu.james.example.dto.HelloworldDTO;
@@ -56,7 +56,7 @@ public class StateMachineXmlFactoryTest {
     @Test
     public void useGenericState() {
         HelloworldDTO req = new HelloworldDTO();
-        GenericState state = (GenericState) testee.initState(req);
+        GenericStateMachine state = (GenericStateMachine) testee.initState(req);
         Object payload = state.getPayload();
         assertTrue(payload instanceof HelloworldDTO);
 

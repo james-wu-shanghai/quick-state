@@ -1,6 +1,6 @@
 package sh.wu.james.common.statemachine.listener;
 
-import sh.wu.james.common.statemachine.GenericState;
+import sh.wu.james.common.statemachine.GenericStateMachine;
 
 /**
  * Class implements the interface is for handling the event during business methods called 
@@ -15,5 +15,5 @@ import sh.wu.james.common.statemachine.GenericState;
  *            is Status mark which will be used to decide the state
  */
 public interface StateListener<T, P, S> {
-	void onEvent(GenericState<T, P, S> state, String eventType);
+	void onEvent(GenericStateMachine<T, P, S> state, String eventType);
 }

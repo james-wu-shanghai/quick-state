@@ -4,7 +4,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import sh.wu.james.common.statemachine.GenericState;
+import sh.wu.james.common.statemachine.GenericStateMachine;
 import sh.wu.james.common.statemachine.factory.StateMachineXmlFactory;
 import sh.wu.james.example.dao.HelloworldDAO;
 import sh.wu.james.example.dto.HelloworldDTO;
@@ -22,6 +22,6 @@ public class HelloworldService {
         HelloworldDTO req = new HelloworldDTO();
         BizOperations state = factory.initState(req);
         BizOperations create = state.create();
-        return ((GenericState<BizOperations, HelloworldDTO, HelloworldStatus>) create).getPayload();
+        return ((GenericStateMachine<BizOperations, HelloworldDTO, HelloworldStatus>) create).getPayload();
     }
 }

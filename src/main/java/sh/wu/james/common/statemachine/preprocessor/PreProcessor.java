@@ -1,6 +1,6 @@
 package sh.wu.james.common.statemachine.preprocessor;
 
-import sh.wu.james.common.statemachine.GenericState;
+import sh.wu.james.common.statemachine.GenericStateMachine;
 
 /**
  * Class implements the interface can process the GenericState before methods calling in state.
@@ -15,5 +15,5 @@ import sh.wu.james.common.statemachine.GenericState;
  *            is Status mark which will be used to decide the state
  */
 public interface PreProcessor {
-	<T, P, S> void process(GenericState<T, P, S> s);
+	<T, P, S> void process(GenericStateMachine<T, P, S> s);
 }

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import sh.wu.james.common.exception.NotSupportOperationException;
 import sh.wu.james.common.exception.StateMachineInitException;
-import sh.wu.james.common.statemachine.GenericState;
+import sh.wu.james.common.statemachine.GenericStateMachine;
 import sh.wu.james.common.statemachine.listener.StateListener;
 import sh.wu.james.common.statemachine.preprocessor.PreProcessor;
 import sh.wu.james.common.statemachine.xml.EventDefinition;
@@ -118,9 +118,9 @@ public class StateMachineXmlFactory<T, P, S> extends AbstactStateFactory<T, P, S
             handler = invocationHandlerBuilderRegistry.get(stateName).build();
         }
         T proxyState = (T) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { bizIfaceClazz,
-                GenericState.class }, handler);
+                GenericStateMachine.class }, handler);
 
-        GenericState generic = initGenericState(req, handler);
+        GenericStateMachine generic = initGenericState(req, handler);
         bindStateAndPayload(req, proxyState, generic);
         return proxyState;
     }
@@ -133,8 +133,8 @@ public class StateMachineXmlFactory<T, P, S> extends AbstactStateFactory<T, P, S
         }
     }
 
-    private GenericState initGenericState(P payload, DynamicSupportMethodHandler handler) {
-        GenericState generic = (GenericState) FactoryUtils.getBeanByType(ctx, GenericState.class);
+    private GenericStateMachine initGenericState(P payload, DynamicSupportMethodHandler handler) {
+        GenericStateMachine generic = (GenericStateMachine) FactoryUtils.getBeanByType(ctx, GenericStateMachine.class);
         generic.setFactory(this);
         generic.setPayload(payload);
         generic.addListener(stateListeners.toArray(new StateListener[stateListeners.size()]));
@@ -143,7 +143,7 @@ public class StateMachineXmlFactory<T, P, S> extends AbstactStateFactory<T, P, S
         return generic;
     }
 
-    private void bindStateAndPayload(P payload, T state, GenericState generic) {
+    private void bindStateAndPayload(P payload, T state, GenericStateMachine generic) {
         Object invokHndlr = ReflectionUtil.getValue(state, "h");
         ReflectionUtil.setValue(invokHndlr, "assignee", generic);
 
@@ -153,12 +153,12 @@ public class StateMachineXmlFactory<T, P, S> extends AbstactStateFactory<T, P, S
 
     private class DynamicSupportMethodHandler implements InvocationHandler {
         private String stateName;
-        private GenericState assignee;
+        private GenericStateMachine assignee;
         private Map<String, String> methodNextStatusMap;
         private Map<String, List<EventDefinition>> methodEventsMap;
         private List<PreProcessor> preProcessor;
 
-        public void setAssignee(GenericState assignee) {
+        public void setAssignee(GenericStateMachine assignee) {
             this.assignee = assignee;
         }
 
@@ -175,7 +175,7 @@ public class StateMachineXmlFactory<T, P, S> extends AbstactStateFactory<T, P, S
             if (method.getDeclaringClass() == Object.class) {
                 return method.invoke(method.getDeclaringClass(), args);
             }
-            if (method.getDeclaringClass() == GenericState.class) {
+            if (method.getDeclaringClass() == GenericStateMachine.class) {
                 return method.invoke(assignee, args);
             }
             String methodName = method.getName();
