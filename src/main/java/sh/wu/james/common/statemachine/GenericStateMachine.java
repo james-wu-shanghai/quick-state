@@ -11,7 +11,7 @@ import sh.wu.james.common.statemachine.preprocessor.PreProcessor;
  * The method define in interface is generic methods of state machine. Comparing to BizInterface, these methods take no
  * relationship to concrete business logic.
  * 
- * @author wujian
+ * @author James Wu
  * 
  * @param <T>
  * @param <P>

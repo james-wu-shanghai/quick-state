@@ -21,7 +21,7 @@
  * 6. Call StateMachineFactory.initState(P payload) method to init a state which return the interface 
  * defined in step #1. Then state can be used.
  *       
- * @author wujian
+ * @author James Wu
  * 
  */
 package sh.wu.james.common.statemachine;

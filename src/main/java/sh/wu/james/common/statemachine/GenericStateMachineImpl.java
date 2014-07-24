@@ -37,31 +37,16 @@ public class GenericStateMachineImpl<T, P, S> implements GenericStateMachine<T, 
 	// 这个Map可以用来放一些预处理需要的信息，这些信息无法存放在Payload中。通常不许要使用
 	private Map<String, Object> extraInfo = new HashMap<String, Object>();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.lufax.common.statemachine.GenericState#getListeners()
-	 */
 	@Override
 	public List<StateListener<T, P, S>> getListeners() {
 		return listeners;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.lufax.common.statemachine.GenericState#getPreProcessors()
-	 */
 	@Override
 	public List<PreProcessor> getPreProcessors() {
 		return preProcessors;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.lufax.common.statemachine.GenericState#setPreProcessors(java.util.List)
-	 */
 	@Override
 	public void setPreProcessors(List<PreProcessor> preProcessors) {
 		this.preProcessors = preProcessors;
@@ -73,61 +58,31 @@ public class GenericStateMachineImpl<T, P, S> implements GenericStateMachine<T, 
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.lufax.common.statemachine.GenericState#setExtraInfo(java.util.Map)
-	 */
 	@Override
 	public void setExtraInfo(Map<String, Object> info) {
 		this.extraInfo = info;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.lufax.common.statemachine.GenericState#getExtraInfo()
-	 */
 	@Override
 	public Map<String, Object> getExtraInfo() {
 		return extraInfo;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.lufax.common.statemachine.GenericState#setNextStatus(S)
-	 */
 	@Override
 	public void setNextStatus(S next) {
 		this.next = next;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.lufax.common.statemachine.GenericState#getNextStatus()
-	 */
 	@Override
 	public S getNextStatus() {
 		return next;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.lufax.common.statemachine.GenericState#getPayload()
-	 */
 	@Override
 	public P getPayload() {
 		return payload;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.lufax.common.statemachine.GenericState#setPayload(P)
-	 */
 	@Override
 	public void setPayload(P object) {
 		this.payload = object;

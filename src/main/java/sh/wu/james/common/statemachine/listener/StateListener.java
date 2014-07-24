@@ -5,7 +5,7 @@ import sh.wu.james.common.statemachine.GenericStateMachine;
 /**
  * Class implements the interface is for handling the event during business methods called 
  * 
- * @author wujian
+ * @author James Wu
  *
  * @param <T>
  *            is a java interface contains all business operations, the API also be defined in XML

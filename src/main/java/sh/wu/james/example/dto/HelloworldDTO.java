@@ -5,7 +5,7 @@ import sh.wu.james.example.statemachine.BizOperations;
 /**
  * 来自渠道的借款请求（控制部分）
  * 
- * @author wujian
+ * @author James Wu
  * 
  */
 public class HelloworldDTO {

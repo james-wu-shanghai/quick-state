@@ -5,7 +5,7 @@ import sh.wu.james.common.statemachine.GenericStateMachine;
 /**
  * Class implements the interface can process the GenericState before methods calling in state.
  * 
- * @author wujian
+ * @author James Wu
  * 
  * @param <T>
  *            is a java interface contains all business operations, the API also be defined in XML

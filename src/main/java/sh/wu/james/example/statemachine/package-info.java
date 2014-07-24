@@ -1,5 +1,5 @@
 /**
  * ChannelLoanRequest的状态机
- * @author wujian
+ * @author James Wu
  */
 package sh.wu.james.example.statemachine;
