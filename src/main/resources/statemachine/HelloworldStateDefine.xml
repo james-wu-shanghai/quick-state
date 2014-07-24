@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StateMachine name="channelLoanRequestStateMachine">
+	<BizInterface class="sh.wu.james.example.statemachine.BizOperations" />
+	<Payload class="sh.wu.james.example.dto.HelloworldDTO">
+		<StateEntity fieldName="state" />
+		<StatusEntity class="sh.wu.james.example.dto.HelloworldStatus"
+			fieldName="status" />
+	</Payload>
+	<StatusStateMapping>
+		<Empty state="start" />
+		<Map statusMark="NEW" state="new" />
+		<Map statusMark="SUBMIT" state="submit" />
+		<Map statusMark="ACCEPT" state="accept" />
+		<Map statusMark="REFUSE" state="refuse" />
+		<Map statusMark="INVESTED" state="invested" />
+		<Map statusMark="CERTIFY_REFUSE" state="certifyRefuse" />
+		<Map statusMark="CERTIFYING" state="waitCertify" />
+
+		<Map statusMark="REJECT" state="end" />
+		<Map statusMark="CANCEL" state="end" />
+		<Map statusMark="CERITFY_SUCCESS" state="end" />
+		<Map statusMark="CERTIFY_REJECT" state="end" />
+		<Map statusMark="CERTIFY_TIMEMOUT" state="end" />
+		<Map statusMark="CERTIFY_CANCEL" state="end" />
+	</StatusStateMapping>
+
+	<Listeners>
+		<Listener id="createReqLsnr"
+			class="sh.wu.james.example.statemachine.listener.CreateEventListener" />
+		<Listener id="changeStatusLsnr"
+			class="sh.wu.james.example.statemachine.listener.ChangeStatusListener" />
+	</Listeners>
+
+	<States>
+		<State name="start">
+			<PreProcessors />
+			<SupportMethods>
+				<SupportMethod name="create" nextStatus="NEW">
+					<Events>
+						<Event type="CREATE" />
+					</Events>
+				</SupportMethod>
+			</SupportMethods>
+		</State>
+
+		<State name="new">
+			<PreProcessors />
+			<SupportMethods>
+				<SupportMethod name="update" nextStatus="NEW">
+					<Events>
+						<Event type="UPDATE_DATA" />
+					</Events>
+				</SupportMethod>
+				<SupportMethod name="submit" nextStatus="SUBMIT">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+			</SupportMethods>
+		</State>
+
+		<State name="submit">
+			<PreProcessors />
+			<SupportMethods>
+				<SupportMethod name="refuse" nextStatus="REFUSE">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+				<SupportMethod name="accept" nextStatus="ACCEPT">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+			</SupportMethods>
+		</State>
+
+		<State name="accept">
+			<PreProcessors />
+			<SupportMethods>
+				<SupportMethod name="finishInvestment" nextStatus="INVESTED">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+				<SupportMethod name="cancelInvestment" nextStatus="INVEST_FAILURE">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+			</SupportMethods>
+		</State>
+
+		<State name="refuse">
+			<PreProcessors />
+			<SupportMethods>
+				<SupportMethod name="update" nextStatus="REFUSE">
+					<Events>
+						<Event type="DATA_UPDATE" />
+					</Events>
+				</SupportMethod>
+				<SupportMethod name="submit" nextStatus="SUBMIT">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+				<SupportMethod name="cancel" nextStatus="CANCEL">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+			</SupportMethods>
+		</State>
+
+		<State name="invested">
+			<PreProcessors />
+			<SupportMethods>
+				<SupportMethod name="certify" nextStatus="CERTIFYING">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+				<SupportMethod name="cancelCertify" nextStatus="CERTIFY_CANCEL">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+			</SupportMethods>
+		</State>
+
+		<State name="waitCertify">
+			<PreProcessors />
+			<SupportMethods>
+				<SupportMethod name="acceptCertify" nextStatus="CERITFY_SUCCESS">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+				<SupportMethod name="timeoutCertify" nextStatus="CERTIFY_TIMEMOUT">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+				<SupportMethod name="rejectCertify" nextStatus="CERTIFY_REJECT">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+				<SupportMethod name="refuseCertify" nextStatus="CERTIFY_REFUSE">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+			</SupportMethods>
+		</State>
+
+		<State name="certifyRefuse">
+			<SupportMethods>
+				<SupportMethod name="certify" nextStatus="CERTIFYING">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+				<SupportMethod name="cancelCertify" nextStatus="CERTIFY_CANCEL">
+					<Events>
+						<Event type="STATUS_CHANGE" />
+					</Events>
+				</SupportMethod>
+			</SupportMethods>
+		</State>
+
+		<State name="end" />
+	</States>
+</StateMachine>
