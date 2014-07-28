@@ -8,163 +8,77 @@
 	</Payload>
 	<StatusStateMapping>
 		<Empty state="start" />
-		<Map statusMark="NEW" state="new" />
-		<Map statusMark="SUBMIT" state="submit" />
-		<Map statusMark="ACCEPT" state="accept" />
-		<Map statusMark="REFUSE" state="refuse" />
-		<Map statusMark="INVESTED" state="invested" />
-		<Map statusMark="CERTIFY_REFUSE" state="certifyRefuse" />
-		<Map statusMark="CERTIFYING" state="waitCertify" />
-
-		<Map statusMark="REJECT" state="end" />
-		<Map statusMark="CANCEL" state="end" />
-		<Map statusMark="CERITFY_SUCCESS" state="end" />
-		<Map statusMark="CERTIFY_REJECT" state="end" />
-		<Map statusMark="CERTIFY_TIMEMOUT" state="end" />
-		<Map statusMark="CERTIFY_CANCEL" state="end" />
+		<Map statusMark="MORNING" state="morning" />
+		<Map statusMark="NOON" state="noon" />
+		<Map statusMark="NIGHT" state="night" />
+		<Map statusMark="MIDNIGHT" state="end" />
 	</StatusStateMapping>
 
 	<Listeners>
 		<Listener id="createReqLsnr"
-			class="sh.wu.james.example.statemachine.listener.CreateEventListener" />
-		<Listener id="changeStatusLsnr"
-			class="sh.wu.james.example.statemachine.listener.ChangeStatusListener" />
+			class="sh.wu.james.example.statemachine.listener.SleepListener" />
+		<Listener id="createReqLsnr"
+			class="sh.wu.james.example.statemachine.listener.StatusChangeListener" />
 	</Listeners>
 
 	<States>
 		<State name="start">
 			<PreProcessors />
 			<SupportMethods>
-				<SupportMethod name="create" nextStatus="NEW">
-					<Events>
-						<Event type="CREATE" />
-					</Events>
+				<SupportMethod name="wakeUp">
+					<NextStep nextStatus="MORNING">
+						<Events>
+							<Event type="statusChange" />
+							<Event type="waked" />
+						</Events>
+					</NextStep>
 				</SupportMethod>
 			</SupportMethods>
 		</State>
 
-		<State name="new">
+		<State name="morning">
 			<PreProcessors />
 			<SupportMethods>
-				<SupportMethod name="update" nextStatus="NEW">
-					<Events>
-						<Event type="UPDATE_DATA" />
-					</Events>
+				<SupportMethod name="eatBreakfast">
+					<NextStep nextStatus="NOON">
+						<Events>
+							<Event type="statusChange" />
+							<Event type="breakfast" />
+						</Events>
+					</NextStep>
 				</SupportMethod>
-				<SupportMethod name="submit" nextStatus="SUBMIT">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
+				<SupportMethod name="sleep">
+					<NextStep nextStatus="NIGHT">
+						<Event type="statusChange" />
+					</NextStep>
 				</SupportMethod>
 			</SupportMethods>
 		</State>
 
-		<State name="submit">
+		<State name="noon">
 			<PreProcessors />
 			<SupportMethods>
-				<SupportMethod name="refuse" nextStatus="REFUSE">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
-				</SupportMethod>
-				<SupportMethod name="accept" nextStatus="ACCEPT">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
+				<SupportMethod name="eatLunch">
+					<NextStep nextStatus="NIGHT">
+						<Events>
+							<Event type="statusChange" />
+							<Event type="lunch" />
+						</Events>
+					</NextStep>
 				</SupportMethod>
 			</SupportMethods>
 		</State>
 
-		<State name="accept">
+		<State name="night">
 			<PreProcessors />
 			<SupportMethods>
-				<SupportMethod name="finishInvestment" nextStatus="INVESTED">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
-				</SupportMethod>
-				<SupportMethod name="cancelInvestment" nextStatus="INVEST_FAILURE">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
-				</SupportMethod>
-			</SupportMethods>
-		</State>
-
-		<State name="refuse">
-			<PreProcessors />
-			<SupportMethods>
-				<SupportMethod name="update" nextStatus="REFUSE">
-					<Events>
-						<Event type="DATA_UPDATE" />
-					</Events>
-				</SupportMethod>
-				<SupportMethod name="submit" nextStatus="SUBMIT">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
-				</SupportMethod>
-				<SupportMethod name="cancel" nextStatus="CANCEL">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
-				</SupportMethod>
-			</SupportMethods>
-		</State>
-
-		<State name="invested">
-			<PreProcessors />
-			<SupportMethods>
-				<SupportMethod name="certify" nextStatus="CERTIFYING">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
-				</SupportMethod>
-				<SupportMethod name="cancelCertify" nextStatus="CERTIFY_CANCEL">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
-				</SupportMethod>
-			</SupportMethods>
-		</State>
-
-		<State name="waitCertify">
-			<PreProcessors />
-			<SupportMethods>
-				<SupportMethod name="acceptCertify" nextStatus="CERITFY_SUCCESS">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
-				</SupportMethod>
-				<SupportMethod name="timeoutCertify" nextStatus="CERTIFY_TIMEMOUT">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
-				</SupportMethod>
-				<SupportMethod name="rejectCertify" nextStatus="CERTIFY_REJECT">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
-				</SupportMethod>
-				<SupportMethod name="refuseCertify" nextStatus="CERTIFY_REFUSE">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
-				</SupportMethod>
-			</SupportMethods>
-		</State>
-
-		<State name="certifyRefuse">
-			<SupportMethods>
-				<SupportMethod name="certify" nextStatus="CERTIFYING">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
-				</SupportMethod>
-				<SupportMethod name="cancelCertify" nextStatus="CERTIFY_CANCEL">
-					<Events>
-						<Event type="STATUS_CHANGE" />
-					</Events>
+				<SupportMethod name="sleep">
+					<NextStep nextStatus="MIDNIGHT">
+						<Events>
+							<Event type="statusChange" />
+							<Event type="sleeping" />
+						</Events>
+					</NextStep>
 				</SupportMethod>
 			</SupportMethods>
 		</State>

@@ -1,7 +1,7 @@
 package sh.wu.james.common.statemachine.factory;
 
 /**
- * @author James Wu
+ * @author wujian
  * 
  * @param <T>
  *            is a java interface contains all business operations, the API also be defined in XML

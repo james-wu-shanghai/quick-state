@@ -1,7 +1,6 @@
 package sh.wu.james.common.statemachine;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,8 +9,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import sh.wu.james.common.statemachine.factory.StateFactory;
+import sh.wu.james.common.statemachine.fork.Judger;
 import sh.wu.james.common.statemachine.listener.StateListener;
 import sh.wu.james.common.statemachine.preprocessor.PreProcessor;
+import sh.wu.james.common.utils.ReflectionUtil;
 
 @Component
 @Scope("prototype")
@@ -37,16 +38,31 @@ public class GenericStateMachineImpl<T, P, S> implements GenericStateMachine<T, 
 	// 这个Map可以用来放一些预处理需要的信息，这些信息无法存放在Payload中。通常不许要使用
 	private Map<String, Object> extraInfo = new HashMap<String, Object>();
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.lufax.common.statemachine.GenericState#getListeners()
+	 */
 	@Override
 	public List<StateListener<T, P, S>> getListeners() {
 		return listeners;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.lufax.common.statemachine.GenericState#getPreProcessors()
+	 */
 	@Override
 	public List<PreProcessor> getPreProcessors() {
 		return preProcessors;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.lufax.common.statemachine.GenericState#setPreProcessors(java.util.List)
+	 */
 	@Override
 	public void setPreProcessors(List<PreProcessor> preProcessors) {
 		this.preProcessors = preProcessors;
@@ -58,31 +74,61 @@ public class GenericStateMachineImpl<T, P, S> implements GenericStateMachine<T, 
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.lufax.common.statemachine.GenericState#setExtraInfo(java.util.Map)
+	 */
 	@Override
 	public void setExtraInfo(Map<String, Object> info) {
 		this.extraInfo = info;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.lufax.common.statemachine.GenericState#getExtraInfo()
+	 */
 	@Override
 	public Map<String, Object> getExtraInfo() {
 		return extraInfo;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.lufax.common.statemachine.GenericState#setNextStatus(S)
+	 */
 	@Override
 	public void setNextStatus(S next) {
 		this.next = next;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.lufax.common.statemachine.GenericState#getNextStatus()
+	 */
 	@Override
 	public S getNextStatus() {
 		return next;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.lufax.common.statemachine.GenericState#getPayload()
+	 */
 	@Override
 	public P getPayload() {
 		return payload;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.lufax.common.statemachine.GenericState#setPayload(P)
+	 */
 	@Override
 	public void setPayload(P object) {
 		this.payload = object;
@@ -102,9 +148,18 @@ public class GenericStateMachineImpl<T, P, S> implements GenericStateMachine<T, 
 		}
 	}
 
-	public T invokeOperation(S next, String... evts) {
+	public T invokeNext(S next, List<String> evts) {
 		setNextStatus(next);
-		handleEventByListeners(Arrays.asList(evts));
+		handleEventByListeners(evts);
+		return factory.initState(payload);
+	}
+
+	public T invokeFork(Map<String, S> forkStatusMap, Map<String, List<String>> forkEventMap, Judger judger) {
+		String path = judger.judge(this);
+		S next = forkStatusMap.get(path);
+		List<String> evts = forkEventMap.get(path);
+		setNextStatus(next);
+		handleEventByListeners(evts);
 		return factory.initState(payload);
 	}
 

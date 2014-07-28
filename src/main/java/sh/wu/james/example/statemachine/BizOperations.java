@@ -1,34 +1,11 @@
 package sh.wu.james.example.statemachine;
 
 public interface BizOperations {
-    BizOperations create();
+    BizOperations wakeUp();
 
-    BizOperations update();
+    BizOperations eatBreakfast();
 
-    BizOperations submit();
+    BizOperations eatLunch();
 
-    BizOperations refuse();
-
-    BizOperations reject();
-
-    BizOperations accept();
-
-    BizOperations cancel();
-
-    BizOperations finishInvestment();
-
-    BizOperations cancelInvestment();
-
-    BizOperations acceptCertify();
-
-    BizOperations timeoutCertify();
-
-    BizOperations certify();
-
-    BizOperations rejectCertify();
-
-    BizOperations refuseCertify();
-
-    BizOperations cancelCeritfy();
-
+    BizOperations sleep();
 }

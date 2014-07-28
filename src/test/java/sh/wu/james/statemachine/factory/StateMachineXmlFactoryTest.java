@@ -27,28 +27,14 @@ public class StateMachineXmlFactoryTest {
     StateMachineXmlFactory<BizOperations, HelloworldDTO, HelloworldStatus> testee;
 
     @Test
-    public void enumNewInstanceTest() throws ClassNotFoundException, SecurityException, NoSuchFieldException {
-        String className = HelloworldStatus.class.getName();
-        Class clazz = Class.forName(className);
-        assertEquals(HelloworldStatus.ACCEPT, Enum.valueOf(clazz, "ACCEPT"));
-    }
-
-    @Test
     public void initState() {
         HelloworldDTO req = new HelloworldDTO();
         BizOperations state = testee.initState(req);
         System.out.println(state);
-        state = state.create();
-        state = state.update();
-        state = state.submit();
-        state = state.refuse();
-        state = state.submit();
-        state = state.accept();
-        state = state.finishInvestment();
-        state = state.certify();
-        state = state.refuseCertify();
-        state = state.certify();
-        state = state.acceptCertify();
+        state = state.wakeUp();
+        state = state.eatBreakfast();
+        state = state.eatLunch();
+        state = state.sleep();
 
         assertEquals("end", (ReflectionUtil.getValue(ReflectionUtil.getValue(state, "h"), "stateName")));
     }
