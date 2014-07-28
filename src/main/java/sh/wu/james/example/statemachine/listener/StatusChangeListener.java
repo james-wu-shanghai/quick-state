@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import sh.wu.james.common.statemachine.GenericStateMachine;
 import sh.wu.james.common.statemachine.listener.StateListener;
+import sh.wu.james.common.utils.Logger;
 import sh.wu.james.example.dao.HelloworldDAO;
 import sh.wu.james.example.dto.HelloworldDTO;
 import sh.wu.james.example.dto.HelloworldStatus;
@@ -19,7 +20,7 @@ public class StatusChangeListener implements StateListener<BizOperations, Hellow
     @Override
     public void onEvent(GenericStateMachine<BizOperations, HelloworldDTO, HelloworldStatus> state, String evtType) {
         if ("statusChange".equals(evtType)) {
-            state.getPayload().setStatus(state.getNextStatus());
+            Logger.info(this, String.format("status change from %s to %s", state.getPrevious(), state.getCurrent()));
         }
     }
 

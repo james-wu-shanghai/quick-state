@@ -43,9 +43,7 @@ public class StateMachineXmlFactory<T, P, S> extends AbstactStateFactory<T, P, S
 	private Class bizIfaceClazz = null;
 	private Class payloadClazz = null;
 	private Class statusEntityClazz = null;
-	private String statusFieldName = null;
-	private String stateFieldName = null;
-	private String statePayloadFieldName = null;
+
 
 	private List<StateListener> stateListeners = new ArrayList<StateListener>();
 
