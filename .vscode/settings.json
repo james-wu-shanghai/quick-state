@@ -1,0 +1,7 @@
+{
+    "maven.executable.path": "D:\\Program Files\\apache-maven-3.9.11\\bin\\mvn.cmd",
+    "java.configuration.maven.userSettings": "D:\\Program Files\\apache-maven-3.9.11\\conf\\settings.xml",
+    "maven.terminal.useJavaHome": true,
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "automatic"
+}

@@ -1,0 +1,34 @@
+你要创建一个通过xml配置的状态机
+状态机包括2部分，xml定义部分，java代码部分。
+xml定义部分定义状态机的状态和转换关系，包括以下元素：
+<state_machine name="">
+    <state name="">
+        <action name="" ref="">
+            <next state="" resp_code=""/>
+            <next state="" resp_code=""/>
+        </action>
+    </state>
+    ...
+</state_machine>
+state_machine 定义状态机名称，里面会包括多个状态(state)，每个状态包括名字以及包含下一个状态的转动作，下一个状态中的action，指定的是一个spring bean, 当state_machine调用action name的方法时，action的bean就会被调用。然后根据action的返回值，来判断下一个状态是哪个。有哪些状态都定义在action元素里面的next元素列表中。
+
+在java层面，利用通用框架和反射自动按照state_machine xml定义，生成对应的状态机对象。不需要硬编码每一个状态机。状态机的会按照xml定义动态生成所有的状态，可以操作的方法。用户只要编写好action的spring bean对象，并配置到xml里的action.ref里就可以了。
+
+举个例子，我有一个状态机，xml定义如下：
+<state_machine name="example">
+    <state name="start">
+        <action name="start" ref="execute">
+            <next state="success" resp_code="200"/>
+            <next state="fail" resp_code="400"/>
+        </action>
+    </state>
+    <state name="success"/>
+    <state name="fail" />
+</state_machine>
+然后我只要在spring配置文件里配置好takeAction的bean，就可以了。takeAction的bean使用统一的接口定义，接口定义如下：
+public interface Action {
+    String doAction(Context context);
+}
+execute的bean需要实现这个接口，当状态机调用start action时，execute的bean就会被调用。execute的bean需要返回一个字符串，根据字符串的值，状态机就会根据xml定义，跳转到下一个状态。    
+
+所有的包都在com.jameswushanghai.state.machine下

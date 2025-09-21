@@ -1,0 +1,2 @@
+现在需要对已经写好的状态机增加测试用来覆盖。
+现在要在src/test/java下增加对com.jameswushanghai.state.machine的测试类。要求测试所有类，测试的分支覆盖率要超过95%，可以使用mockito来mock依赖的bean。

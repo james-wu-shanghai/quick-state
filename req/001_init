@@ -1,0 +1,7 @@
+这是一个springboot项目，基于maven配置。
+请初始化这个项目，其中
+groupId = com.jameswushanghai.
+artifactId = state.machine
+version = 1.0.0
+
+依赖的包lib包括springboot, lombok, testng, slf4j, log4j2, mockito
