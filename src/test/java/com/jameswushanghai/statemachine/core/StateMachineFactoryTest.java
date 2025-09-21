@@ -1,22 +1,31 @@
 package com.jameswushanghai.statemachine.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
+import com.jameswushanghai.statemachine.api.DemoStateMachine;
+import com.jameswushanghai.statemachine.core.Action;
+import com.jameswushanghai.statemachine.core.Context;
+import com.jameswushanghai.statemachine.core.StateMachine;
+import com.jameswushanghai.statemachine.model.StateMachineConfig;
+import com.jameswushanghai.statemachine.parser.StateMachineXmlParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
+import org.mockito.Mockito;
+import static org.mockito.Mockito.*;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+import static org.junit.Assert.*;
 
 /**
  * StateMachineFactory的测试类
@@ -60,7 +69,7 @@ public class StateMachineFactoryTest {
         when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
 
         // 调用方法
-        StateMachine stateMachine = stateMachineFactory.createStateMachineFromXmlString(xml);
+        StateMachine stateMachine = stateMachineFactory.createStateMachineInterfaceFromXmlString(xml);
 
         // 验证结果
         assertNotNull(stateMachine);
@@ -105,14 +114,14 @@ public class StateMachineFactoryTest {
         when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
 
         // 调用方法
-        StateMachine stateMachine = stateMachineFactory.createStateMachineFromXml(configLocation);
+        StateMachine stateMachine = stateMachineFactory.createStateMachineInterfaceFromXml(configLocation);
 
         // 验证结果
         assertNotNull(stateMachine);
         assertEquals("testMachine", stateMachine.getName());
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = IOException.class)
     public void testCreateStateMachineFromXmlFileNotFound() throws Exception {
         // 准备XML配置文件路径
         String configLocation = "classpath:non-existent.xml";
@@ -145,7 +154,7 @@ public class StateMachineFactoryTest {
         when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
 
         // 调用方法，应该抛出异常
-        stateMachineFactory.createStateMachineFromXmlString(invalidXml);
+        stateMachineFactory.createStateMachineInterfaceFromXmlString(invalidXml);
     }
 
     @Test
@@ -163,7 +172,7 @@ public class StateMachineFactoryTest {
         when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
 
         // 先创建状态机
-        stateMachineFactory.createStateMachineFromXmlString(xml);
+        stateMachineFactory.createStateMachineInterfaceFromXmlString(xml);
 
         // 然后通过名称获取状态机
         StateMachine stateMachine = stateMachineFactory.getStateMachine("testMachine");
@@ -203,8 +212,8 @@ public class StateMachineFactoryTest {
         when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
 
         // 创建两个状态机
-        StateMachine machine1 = stateMachineFactory.createStateMachineFromXmlString(xml1);
-        StateMachine machine2 = stateMachineFactory.createStateMachineFromXmlString(xml2);
+        StateMachine machine1 = stateMachineFactory.createStateMachineInterfaceFromXmlString(xml1);
+        StateMachine machine2 = stateMachineFactory.createStateMachineInterfaceFromXmlString(xml2);
 
         // 验证结果
         assertNotNull(machine1);
@@ -230,5 +239,57 @@ public class StateMachineFactoryTest {
         public String doAction(Context context) {
             return "SUCCESS";
         }
+    }
+    
+    @Test
+    public void testGetStateMachineApi() throws Exception {
+        // 准备XML字符串
+        String xml = "<state-machine name=\"testMachine\">\n" +
+                "  <state name=\"state1\">\n" +
+                "    <action name=\"action1\" ref=\"testAction\">\n" +
+                "      <next-state response=\"SUCCESS\" state=\"state2\"/>\n" +
+                "    </action>\n" +
+                "  </state>\n" +
+                "</state-machine>";
+        
+        // 模拟ApplicationContext行为
+        when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
+        
+        // 先创建状态机
+        stateMachineFactory.createStateMachineInterfaceFromXmlString(xml);
+        
+        // 获取API代理
+        DemoStateMachine apiProxy = stateMachineFactory.getStateMachineApi("testMachine", DemoStateMachine.class);
+        
+        // 验证结果
+        assertNotNull(apiProxy);
+        assertTrue(Proxy.isProxyClass(apiProxy.getClass()));
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetStateMachineApiInvalidInterface() throws Exception {
+        // 准备XML字符串
+        String xml = "<state-machine name=\"testMachine\">\n" +
+                "  <state name=\"state1\">\n" +
+                "    <action name=\"action1\" ref=\"testAction\">\n" +
+                "      <next-state response=\"SUCCESS\" state=\"state2\"/>\n" +
+                "    </action>\n" +
+                "  </state>\n" +
+                "</state-machine>";
+        
+        // 模拟ApplicationContext行为
+        when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
+        
+        // 先创建状态机
+        stateMachineFactory.createStateMachineInterfaceFromXmlString(xml);
+        
+        // 尝试使用非接口类型
+        stateMachineFactory.getStateMachineApi("testMachine", String.class);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetStateMachineApiNotFound() {
+        // 尝试获取不存在的状态机的API
+        stateMachineFactory.getStateMachineApi("nonExistentMachine", DemoStateMachine.class);
     }
 }

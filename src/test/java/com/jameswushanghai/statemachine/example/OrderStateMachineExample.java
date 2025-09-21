@@ -59,7 +59,7 @@ public class OrderStateMachineExample {
                     "</stateMachine>";
             
             // 创建状态机
-            StateMachine stateMachine = stateMachineFactory.createStateMachineFromXmlString(xmlConfig);
+            StateMachine stateMachine = stateMachineFactory.createStateMachineInterfaceFromXmlString(xmlConfig);
             
             // 初始化状态机
             stateMachine.initialize("CREATED");

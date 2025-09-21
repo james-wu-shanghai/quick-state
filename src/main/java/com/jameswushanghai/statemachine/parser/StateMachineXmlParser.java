@@ -77,6 +77,16 @@ public class StateMachineXmlParser {
         }
         config.setName(name);
         
+        // 解析API接口配置
+        NodeList apiNodes = root.getElementsByTagName("api");
+        if (apiNodes.getLength() > 0) {
+            Element apiElement = (Element) apiNodes.item(0);
+            if (apiElement.hasAttribute("interface")) {
+                String apiInterface = apiElement.getAttribute("interface");
+                config.setApiInterface(apiInterface);
+            }
+        }
+        
         // 解析所有状态
         NodeList stateNodes = root.getElementsByTagName("state");
         for (int i = 0; i < stateNodes.getLength(); i++) {

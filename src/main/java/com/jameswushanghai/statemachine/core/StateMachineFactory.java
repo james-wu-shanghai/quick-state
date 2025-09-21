@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,12 +52,37 @@ public class StateMachineFactory implements InitializingBean {
     }
     
     /**
+     * 根据名称获取状态机API代理对象
+     * @param name 状态机名称
+     * @param apiType API接口类型
+     * @param <T> 泛型类型
+     * @return API代理对象
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getStateMachineApi(String name, Class<T> apiType) {
+        StateMachine stateMachine = getStateMachine(name);
+        StateMachineConfig config = ((DefaultStateMachine) stateMachine).getConfig();
+        
+        String apiInterface = config.getApiInterface();
+        if (apiInterface == null || !apiInterface.equals(apiType.getName())) {
+            throw new IllegalArgumentException("状态机[" + name + "]的API接口类型不匹配");
+        }
+        
+        try {
+            return (T) StateMachineApiProxy.createProxy(stateMachine, applicationContext, apiInterface);
+        } catch (Exception e) {
+            log.error("创建状态机API代理失败: {}", e.getMessage(), e);
+            throw new RuntimeException("创建状态机API代理失败", e);
+        }
+    }
+    
+    /**
      * 从XML文件创建状态机
      * @param configLocation XML配置文件路径
-     * @return 状态机实例
+     * @return 状态机实例或API代理对象
      * @throws Exception 创建异常
      */
-    public StateMachine createStateMachineFromXml(String configLocation) throws Exception {
+    public Object createStateMachineFromXml(String configLocation) throws Exception {
         try {
             Resource resource = resourceLoader.getResource(configLocation);
             if (!resource.exists()) {
@@ -72,12 +98,27 @@ public class StateMachineFactory implements InitializingBean {
     }
     
     /**
-     * 从XML字符串创建状态机
-     * @param xmlString XML配置字符串
-     * @return 状态机实例
+     * 从XML文件创建状态机并返回StateMachine接口
+     * @param configLocation XML配置文件路径
+     * @return StateMachine接口实例
      * @throws Exception 创建异常
      */
-    public StateMachine createStateMachineFromXmlString(String xmlString) throws Exception {
+    public StateMachine createStateMachineInterfaceFromXml(String configLocation) throws Exception {
+        Object machine = createStateMachineFromXml(configLocation);
+        if (machine instanceof StateMachine) {
+            return (StateMachine) machine;
+        }
+        // 如果返回的是代理对象，从内部获取StateMachine实例
+        return ((StateMachineApiProxy)Proxy.getInvocationHandler(machine)).getStateMachine();
+    }
+    
+    /**
+     * 从XML字符串创建状态机
+     * @param xmlString XML配置字符串
+     * @return 状态机实例或API代理对象
+     * @throws Exception 创建异常
+     */
+    public Object createStateMachineFromXmlString(String xmlString) throws Exception {
         try {
             if (!StringUtils.hasText(xmlString)) {
                 throw new IllegalArgumentException("XML字符串不能为空");
@@ -92,14 +133,43 @@ public class StateMachineFactory implements InitializingBean {
     }
     
     /**
+     * 从XML字符串创建状态机并返回StateMachine接口
+     * @param xmlString XML配置字符串
+     * @return StateMachine接口实例
+     * @throws Exception 创建异常
+     */
+    public StateMachine createStateMachineInterfaceFromXmlString(String xmlString) throws Exception {
+        Object machine = createStateMachineFromXmlString(xmlString);
+        if (machine instanceof StateMachine) {
+            return (StateMachine) machine;
+        }
+        // 如果返回的是代理对象，从内部获取StateMachine实例
+        return ((StateMachineApiProxy)Proxy.getInvocationHandler(machine)).getStateMachine();
+    }
+    
+    /**
      * 根据配置创建状态机
      * @param config 状态机配置
-     * @return 状态机实例
+     * @return 状态机实例或API代理对象
      */
-    private StateMachine createStateMachine(StateMachineConfig config) {
+    private Object createStateMachine(StateMachineConfig config) {
         DefaultStateMachine stateMachine = new DefaultStateMachine(config, applicationContext);
         stateMachines.put(config.getName(), stateMachine);
         log.info("成功创建状态机[{}]，包含{}个状态", config.getName(), config.getStateCount());
+        
+        // 如果配置了API接口，返回代理对象
+        String apiInterface = config.getApiInterface();
+        if (apiInterface != null && !apiInterface.isEmpty()) {
+            try {
+                return StateMachineApiProxy.createProxy(stateMachine, applicationContext, apiInterface);
+            } catch (Exception e) {
+                log.error("创建状态机API代理失败: {}", e.getMessage(), e);
+                // 如果创建代理失败，返回原始状态机
+                return stateMachine;
+            }
+        }
+        
+        // 否则返回原始状态机
         return stateMachine;
     }
     

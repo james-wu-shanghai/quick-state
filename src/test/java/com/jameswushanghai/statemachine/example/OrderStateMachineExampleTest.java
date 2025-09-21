@@ -35,7 +35,7 @@ public class OrderStateMachineExampleTest {
     public void testRunExample() {
         try {
             // 模拟状态机工厂创建状态机
-            when(mockStateMachineFactory.createStateMachineFromXmlString(anyString())).thenReturn(mockStateMachine);
+            when(mockStateMachineFactory.createStateMachineInterfaceFromXmlString(anyString())).thenReturn(mockStateMachine);
             
             // 模拟状态机执行动作的返回值
             when(mockStateMachine.execute(eq("PAY"), any(Context.class))).thenReturn("PAID");
@@ -53,7 +53,7 @@ public class OrderStateMachineExampleTest {
             orderStateMachineExample.runExample();
 
             // 验证方法调用
-            verify(mockStateMachineFactory).createStateMachineFromXmlString(anyString());
+            verify(mockStateMachineFactory).createStateMachineInterfaceFromXmlString(anyString());
             verify(mockStateMachine).initialize("CREATED");
             verify(mockStateMachine).execute(eq("PAY"), any(Context.class));
             verify(mockStateMachine).execute(eq("SHIP"), any(Context.class));
@@ -70,13 +70,13 @@ public class OrderStateMachineExampleTest {
     public void testRunExampleWithException() {
         try {
             // 模拟状态机工厂创建状态机时抛出异常
-            when(mockStateMachineFactory.createStateMachineFromXmlString(anyString())).thenThrow(new RuntimeException("Creation failed"));
+            when(mockStateMachineFactory.createStateMachineInterfaceFromXmlString(anyString())).thenThrow(new RuntimeException("Creation failed"));
 
             // 运行示例 - 应该不会抛出异常，而是捕获并记录日志
             orderStateMachineExample.runExample();
 
             // 验证方法调用
-            verify(mockStateMachineFactory).createStateMachineFromXmlString(anyString());
+            verify(mockStateMachineFactory).createStateMachineInterfaceFromXmlString(anyString());
             // 后续方法不应该被调用
             verify(mockStateMachine, never()).initialize(anyString());
             verify(mockStateMachine, never()).execute(anyString(), any(Context.class));
@@ -90,7 +90,7 @@ public class OrderStateMachineExampleTest {
     public void testRunExampleWithExecuteException() {
         try {
             // 模拟创建状态机成功，但执行动作时抛出异常
-            when(mockStateMachineFactory.createStateMachineFromXmlString(anyString())).thenReturn(mockStateMachine);
+            when(mockStateMachineFactory.createStateMachineInterfaceFromXmlString(anyString())).thenReturn(mockStateMachine);
             
             // 模拟initialize方法正常执行
             doNothing().when(mockStateMachine).initialize("CREATED");
@@ -103,7 +103,7 @@ public class OrderStateMachineExampleTest {
             orderStateMachineExample.runExample();
 
             // 验证方法调用
-            verify(mockStateMachineFactory).createStateMachineFromXmlString(anyString());
+            verify(mockStateMachineFactory).createStateMachineInterfaceFromXmlString(anyString());
             verify(mockStateMachine).initialize("CREATED");
             verify(mockStateMachine).execute(eq("PAY"), any(Context.class));
             // 后续的execute不应该被调用
@@ -120,7 +120,7 @@ public class OrderStateMachineExampleTest {
     public void testRunExampleWithDifferentStateTransitions() {
         try {
             // 模拟不同的状态转换路径
-            when(mockStateMachineFactory.createStateMachineFromXmlString(anyString())).thenReturn(mockStateMachine);
+            when(mockStateMachineFactory.createStateMachineInterfaceFromXmlString(anyString())).thenReturn(mockStateMachine);
             
             // 模拟状态机执行动作的返回值（支付失败）
             when(mockStateMachine.execute(eq("PAY"), any(Context.class))).thenReturn("FAILED");
@@ -135,7 +135,7 @@ public class OrderStateMachineExampleTest {
             orderStateMachineExample.runExample();
 
             // 验证方法调用
-            verify(mockStateMachineFactory).createStateMachineFromXmlString(anyString());
+            verify(mockStateMachineFactory).createStateMachineInterfaceFromXmlString(anyString());
             verify(mockStateMachine).initialize("CREATED");
             verify(mockStateMachine).execute(eq("PAY"), any(Context.class));
             // 后续的execute不应该被调用，因为状态变为FAILED
@@ -153,13 +153,13 @@ public class OrderStateMachineExampleTest {
     public void testRunExampleWithNullStateMachine() {
         try {
             // 模拟状态机工厂返回null
-            when(mockStateMachineFactory.createStateMachineFromXmlString(anyString())).thenReturn(null);
+            when(mockStateMachineFactory.createStateMachineInterfaceFromXmlString(anyString())).thenReturn(null);
 
             // 运行示例 - 应该不会抛出异常，而是捕获并记录日志
             orderStateMachineExample.runExample();
 
             // 验证方法调用
-            verify(mockStateMachineFactory).createStateMachineFromXmlString(anyString());
+            verify(mockStateMachineFactory).createStateMachineInterfaceFromXmlString(anyString());
             // 后续方法不应该被调用
             verify(mockStateMachine, never()).initialize(anyString());
             verify(mockStateMachine, never()).execute(anyString(), any(Context.class));

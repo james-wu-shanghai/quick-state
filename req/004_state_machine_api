@@ -1,0 +1,50 @@
+现在要为状态机添加java代码层面的可操作编程界面。
+在目前的状态机xml基础上，增加一个API的定义，指明API对应的java interface。interface里所有的方法会对应到state里面的action,以name相匹配。如果没有匹配到，会抛出异常。
+这个API对应的java interface是用户自定义的，用户需要根据状态机的xml定义，自己编写对应的interface。
+用户也可以不指定api元素，则在这样的情况下，就用默认的StateMachine接口。用户也就没法在代码里指令式操纵状态机，只能用DefaultStateMachine.execute()接口驱动状态机。
+如果指定的api元素，则StateMachineFactory在创建状态机实例时，会返回xml里定义的interface的代理对象。用户调用这个代理对象的方法时，会被转发到对应的action bean的方法上。
+<state_machine name="">
+    <api interface=""/>
+    
+    <state name="">
+        <action name="" ref="">
+            <next state="" resp_code=""/>
+            <next state="" resp_code=""/>
+        </action>
+    </state>
+    ...
+</state_machine>
+
+举个例子，我有一个状态机，xml定义如下：
+<state_machine name="example">
+    <api interface="com.jameswushanghai.state.machine.api.DemoStateMachine"/>
+
+    <state name="start">
+        <action name="start" ref="execute">
+            <next state="success" resp_code="200"/>
+            <next state="fail" resp_code="400"/>
+        </action>
+    </state>
+    
+    <state name="success"/>
+
+    
+    <state name="fail" >
+        <action name="retry" ref="execute">
+            <next state="success" resp_code="200"/>
+            <next state="fail" resp_code="400"/>
+            <next state="fatal" resp_code="401"/>
+        </action>
+    </state>
+
+    <state name="fatal" />
+
+</state_machine>
+
+这个DemoAction中定义了2个方法：
+public interface DemoStateMachine {
+    DemoStateMachine start();
+    DemoStateMachine retry();
+}
+
+DemoStateMachine 就是用户创建的java interface。

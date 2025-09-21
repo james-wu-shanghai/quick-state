@@ -9,6 +9,10 @@ import java.util.Collections;
  * 表示整个状态机的配置信息
  */
 public class StateMachineConfig {
+
+    // API接口类名
+    private String apiInterface;
+
     
     // 状态机名称
     private String name;
@@ -66,5 +70,14 @@ public class StateMachineConfig {
 
     public void setStates(Map<String, StateConfig> states) {
         this.states = states != null ? states : new HashMap<>();
+    }
+
+    // Getter and Setter for apiInterface
+    public String getApiInterface() {
+        return apiInterface;
+    }
+
+    public void setApiInterface(String apiInterface) {
+        this.apiInterface = apiInterface;
     }
 }
