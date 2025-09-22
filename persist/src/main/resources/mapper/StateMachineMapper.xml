@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jameswushanghai.statemachine.persist.mapper.StateMachineMapper">
+
+    <!-- Result Mapping -->
+    <resultMap id="BaseResultMap" type="com.jameswushanghai.statemachine.persist.entity.StateMachineEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="config_name" property="configName" jdbcType="VARCHAR"/>
+        <result column="config_version" property="configVersion" jdbcType="INTEGER"/>
+        <result column="current_state" property="currentState" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- Table Name -->
+    <sql id="tableName">state_machine</sql>
+
+    <!-- All Columns -->
+    <sql id="baseColumns">
+        id, name, config_name, config_version, current_state, create_time, update_time
+    </sql>
+
+    <!-- Query By ID -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM <include refid="tableName"/>
+        WHERE id = #{id}
+    </select>
+
+    <!-- Query By Name -->
+    <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM <include refid="tableName"/>
+        WHERE name = #{name}
+    </select>
+
+    <!-- Query All State Machine Instances By Config Name -->
+    <select id="selectByConfigName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM <include refid="tableName"/>
+        WHERE config_name = #{configName}
+        ORDER BY id DESC
+    </select>
+
+    <!-- Query All -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM <include refid="tableName"/>
+        ORDER BY id DESC
+    </select>
+
+    <!-- Insert -->
+    <insert id="insert" parameterType="com.jameswushanghai.statemachine.persist.entity.StateMachineEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO <include refid="tableName"/>
+        (name, config_name, config_version, current_state, create_time, update_time)
+        VALUES
+        (#{name}, #{configName}, #{configVersion}, #{currentState}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- Update -->
+    <update id="update" parameterType="com.jameswushanghai.statemachine.persist.entity.StateMachineEntity">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="configName != null">config_name = #{configName},</if>
+            <if test="configVersion != null">config_version = #{configVersion},</if>
+            <if test="currentState != null">current_state = #{currentState},</if>
+            update_time = #{updateTime}
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- Delete By ID -->
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM <include refid="tableName"/>
+        WHERE id = #{id}
+    </delete>
+
+    <!-- Delete By Name -->
+    <delete id="deleteByName" parameterType="java.lang.String">
+        DELETE FROM <include refid="tableName"/>
+        WHERE name = #{name}
+    </delete>
+
+    <!-- Delete All State Machine Instances By Config Name -->
+    <delete id="deleteByConfigName" parameterType="java.lang.String">
+        DELETE FROM <include refid="tableName"/>
+        WHERE config_name = #{configName}
+    </delete>
+
+    <!-- Check If Exists -->
+    <select id="existsByName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM <include refid="tableName"/>
+        WHERE name = #{name}
+    </select>
+
+</mapper>

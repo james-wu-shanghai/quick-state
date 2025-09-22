@@ -1,0 +1,112 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jameswushanghai.statemachine.persist.mapper.StateMachineConfigMapper">
+
+    <!-- Result Mapping -->
+    <resultMap id="BaseResultMap" type="com.jameswushanghai.statemachine.persist.entity.StateMachineConfig">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="config_xml" property="configXml" jdbcType="LONGVARCHAR"/>
+        <result column="version" property="version" jdbcType="INTEGER"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- Table Name -->
+    <sql id="tableName">state_machine_config</sql>
+
+    <!-- All Columns -->
+    <sql id="baseColumns">
+        id, name, config_xml, version, description, create_time, update_time
+    </sql>
+
+    <!-- Query By ID -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM <include refid="tableName"/>
+        WHERE id = #{id}
+    </select>
+
+    <!-- Query Latest Version of State Machine Config By Name -->
+    <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM <include refid="tableName"/>
+        WHERE name = #{name}
+        ORDER BY version DESC
+        LIMIT 1
+    </select>
+
+    <!-- Query State Machine Config By Name and Version -->
+    <select id="selectByNameAndVersion" resultMap="BaseResultMap">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM <include refid="tableName"/>
+        WHERE name = #{name}
+        AND version = #{version}
+    </select>
+
+    <!-- Query All -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM <include refid="tableName"/>
+        ORDER BY name ASC, version DESC
+    </select>
+
+    <!-- Insert -->
+    <insert id="insert" parameterType="com.jameswushanghai.statemachine.persist.entity.StateMachineConfig" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO <include refid="tableName"/>
+        (name, config_xml, version, description, create_time, update_time)
+        VALUES
+        (#{name}, #{configXml}, #{version}, #{description}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- Update -->
+    <update id="update" parameterType="com.jameswushanghai.statemachine.persist.entity.StateMachineConfig">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="configXml != null">config_xml = #{configXml},</if>
+            <if test="version != null">version = #{version},</if>
+            <if test="description != null">description = #{description},</if>
+            update_time = #{updateTime}
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- Delete By ID -->
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM <include refid="tableName"/>
+        WHERE id = #{id}
+    </delete>
+
+    <!-- Delete By Name -->
+    <delete id="deleteByName" parameterType="java.lang.String">
+        DELETE FROM <include refid="tableName"/>
+        WHERE name = #{name}
+    </delete>
+
+    <!-- Check If Exists -->
+    <select id="existsByName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM <include refid="tableName"/>
+        WHERE name = #{name}
+    </select>
+
+    <!-- Check If State Machine Config Exists By Name and Version -->
+    <select id="existsByNameAndVersion" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM <include refid="tableName"/>
+        WHERE name = #{name}
+        AND version = #{version}
+    </select>
+
+    <!-- Get Max Version By Name -->
+    <select id="getMaxVersionByName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT MAX(version) FROM <include refid="tableName"/>
+        WHERE name = #{name}
+    </select>
+
+</mapper>
