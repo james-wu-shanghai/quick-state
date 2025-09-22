@@ -1,9 +1,13 @@
 -- 状态机表结构创建脚本
 CREATE TABLE IF NOT EXISTS state_machine (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE,
-    config LONGVARCHAR,
-    current_state VARCHAR(100),
-    create_time TIMESTAMP NOT NULL,
-    update_time TIMESTAMP NOT NULL
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    name VARCHAR(255) NOT NULL UNIQUE COMMENT '状态机名称',
+    config TEXT COMMENT '状态机配置JSON',
+    current_state VARCHAR(100) COMMENT '当前状态',
+    status TINYINT NOT NULL DEFAULT 1 COMMENT '状态: 1-启用 0-禁用',
+    version INT NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
+    create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    create_by VARCHAR(64) COMMENT '创建者',
+    update_by VARCHAR(64) COMMENT '更新者'
 );

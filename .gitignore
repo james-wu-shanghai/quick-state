@@ -29,6 +29,7 @@ nbdist/
 
 # vscode
 .vscode/
+*/target/**/*.*
 
 # OS generated files
 .DS_Store
@@ -125,4 +126,3 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-**/target/*.*
