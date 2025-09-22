@@ -63,6 +63,10 @@ public class StateMachineFactory implements InitializingBean {
         StateMachine stateMachine = getStateMachine(name);
         StateMachineConfig config = ((DefaultStateMachine) stateMachine).getConfig();
         
+        if (apiType == null) {
+            throw new IllegalArgumentException("API接口类型不能为空");
+        }
+        
         String apiInterface = config.getApiInterface();
         if (apiInterface == null || !apiInterface.equals(apiType.getName())) {
             throw new IllegalArgumentException("状态机[" + name + "]的API接口类型不匹配");

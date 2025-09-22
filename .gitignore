@@ -12,6 +12,7 @@ release.properties
 *.iws
 *.ipr
 out/
+.gradle
 
 # Eclipse
 .settings/

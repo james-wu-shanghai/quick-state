@@ -1,16 +1,17 @@
 package com.jameswushanghai.statemachine.api;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.MockitoAnnotations;
+
 import com.jameswushanghai.statemachine.core.Context;
 import com.jameswushanghai.statemachine.core.StateMachine;
 import com.jameswushanghai.statemachine.core.StateMachineFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
  * 状态机API功能测试
@@ -22,9 +23,10 @@ public class StateMachineApiTest {
     
     @Mock
     private StateMachine stateMachine;
-    
     @Mock
     private DemoStateMachine demoStateMachine;
+    
+  
     
    /**
     * 這個case需要測試新創建一個狀態機，然後觸發start方法，第一次start會失敗，然後判斷狀態機的狀態是fail

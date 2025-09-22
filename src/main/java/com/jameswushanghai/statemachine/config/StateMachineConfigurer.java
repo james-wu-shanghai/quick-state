@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan({
     "com.jameswushanghai.statemachine.core",
     "com.jameswushanghai.statemachine.parser",
-    "com.jameswushanghai.statemachine.example"
+    "com.jameswushanghai.statemachine.api"
 })
 public class StateMachineConfigurer {
     

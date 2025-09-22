@@ -1,31 +1,31 @@
 package com.jameswushanghai.statemachine.core;
 
-import com.jameswushanghai.statemachine.api.DemoStateMachine;
-import com.jameswushanghai.statemachine.core.Action;
-import com.jameswushanghai.statemachine.core.Context;
-import com.jameswushanghai.statemachine.core.StateMachine;
-import com.jameswushanghai.statemachine.model.StateMachineConfig;
-import com.jameswushanghai.statemachine.parser.StateMachineXmlParser;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Proxy;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-
-import static org.junit.Assert.*;
+import com.jameswushanghai.statemachine.api.DemoStateMachine;
+import com.jameswushanghai.statemachine.model.StateMachineConfig;
 
 /**
  * StateMachineFactory的测试类
@@ -245,6 +245,7 @@ public class StateMachineFactoryTest {
     public void testGetStateMachineApi() throws Exception {
         // 准备XML字符串
         String xml = "<state-machine name=\"testMachine\">\n" +
+                "  <api>com.jameswushanghai.statemachine.api.DemoStateMachine</api>\n" +
                 "  <state name=\"state1\">\n" +
                 "    <action name=\"action1\" ref=\"testAction\">\n" +
                 "      <next-state response=\"SUCCESS\" state=\"state2\"/>\n" +
@@ -291,5 +292,248 @@ public class StateMachineFactoryTest {
     public void testGetStateMachineApiNotFound() {
         // 尝试获取不存在的状态机的API
         stateMachineFactory.getStateMachineApi("nonExistentMachine", DemoStateMachine.class);
+    }
+
+    @Test
+    public void testCreateStateMachineFromXmlStringReturnProxy() throws Exception {
+        // 准备带API接口的XML字符串
+        String xml = "<state-machine name=\"testMachine\">\n" +
+                "  <api>com.jameswushanghai.statemachine.api.DemoStateMachine</api>\n" +
+                "  <state name=\"state1\">\n" +
+                "    <action name=\"action1\" ref=\"testAction\">\n" +
+                "      <next-state response=\"SUCCESS\" state=\"state2\"/>\n" +
+                "    </action>\n" +
+                "  </state>\n" +
+                "</state-machine>";
+
+        // 模拟ApplicationContext行为
+        when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
+
+        // 调用方法
+        Object result = stateMachineFactory.createStateMachineFromXmlString(xml);
+
+        // 验证结果是代理对象
+        assertNotNull(result);
+        assertTrue(Proxy.isProxyClass(result.getClass()));
+    }
+
+    @Test
+    public void testCreateStateMachineFromXmlReturnProxy() throws Exception {
+        // 准备XML配置文件路径
+        String configLocation = "classpath:test-machine.xml";
+
+        // 准备带API接口的XML字符串
+        String xml = "<state-machine name=\"testMachine\">\n" +
+                "  <api>com.jameswushanghai.statemachine.api.DemoStateMachine</api>\n" +
+                "  <state name=\"state1\">\n" +
+                "    <action name=\"action1\" ref=\"testAction\">\n" +
+                "      <next-state response=\"SUCCESS\" state=\"state2\"/>\n" +
+                "    </action>\n" +
+                "  </state>\n" +
+                "</state-machine>";
+
+        // 创建输入流
+        InputStream inputStream = new ByteArrayInputStream(xml.getBytes());
+
+        // 模拟Resource和ResourceLoader行为
+        when(resourceLoader.getResource(configLocation)).thenReturn(resource);
+        when(resource.exists()).thenReturn(true);
+        when(resource.getInputStream()).thenReturn(inputStream);
+
+        // 模拟ApplicationContext行为
+        when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
+
+        // 调用方法
+        Object result = stateMachineFactory.createStateMachineFromXml(configLocation);
+
+        // 验证结果是代理对象
+        assertNotNull(result);
+        assertTrue(Proxy.isProxyClass(result.getClass()));
+    }
+
+    @Test
+    public void testCreateStateMachineApiProxyCreationFailure() throws Exception {
+        // 准备带API接口的XML字符串
+        String xml = "<state-machine name=\"testMachine\">\n" +
+                "  <api>com.jameswushanghai.statemachine.api.NonExistentInterface</api>\n" +
+                "  <state name=\"state1\">\n" +
+                "    <action name=\"action1\" ref=\"testAction\">\n" +
+                "      <next-state response=\"SUCCESS\" state=\"state2\"/>\n" +
+                "    </action>\n" +
+                "  </state>\n" +
+                "</state-machine>";
+
+        // 模拟ApplicationContext行为
+        when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
+
+        // 调用方法 - 预期会创建状态机但API代理创建失败
+        StateMachine stateMachine = stateMachineFactory.createStateMachineInterfaceFromXmlString(xml);
+
+        // 验证状态机仍然被创建
+        assertNotNull(stateMachine);
+        assertEquals("testMachine", stateMachine.getName());
+    }
+
+    @Test
+    public void testCreateStateMachineInterfaceFromXmlStringWithProxy() throws Exception {
+        // 准备带API接口的XML字符串
+        String xml = "<state-machine name=\"testMachine\">\n" +
+                "  <api>com.jameswushanghai.statemachine.api.DemoStateMachine</api>\n" +
+                "  <state name=\"state1\">\n" +
+                "    <action name=\"action1\" ref=\"testAction\">\n" +
+                "      <next-state response=\"SUCCESS\" state=\"state2\"/>\n" +
+                "    </action>\n" +
+                "  </state>\n" +
+                "</state-machine>";
+
+        // 模拟ApplicationContext行为
+        when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
+
+        // 调用方法
+        StateMachine stateMachine = stateMachineFactory.createStateMachineInterfaceFromXmlString(xml);
+
+        // 验证结果是状态机实例
+        assertNotNull(stateMachine);
+        assertEquals("testMachine", stateMachine.getName());
+    }
+
+    @Test
+    public void testCreateStateMachineInterfaceFromXmlWithProxy() throws Exception {
+        // 准备XML配置文件路径
+        String configLocation = "classpath:test-machine.xml";
+
+        // 准备带API接口的XML字符串
+        String xml = "<state-machine name=\"testMachine\">\n" +
+                "  <api>com.jameswushanghai.statemachine.api.DemoStateMachine</api>\n" +
+                "  <state name=\"state1\">\n" +
+                "    <action name=\"action1\" ref=\"testAction\">\n" +
+                "      <next-state response=\"SUCCESS\" state=\"state2\"/>\n" +
+                "    </action>\n" +
+                "  </state>\n" +
+                "</state-machine>";
+
+        // 创建输入流
+        InputStream inputStream = new ByteArrayInputStream(xml.getBytes());
+
+        // 模拟Resource和ResourceLoader行为
+        when(resourceLoader.getResource(configLocation)).thenReturn(resource);
+        when(resource.exists()).thenReturn(true);
+        when(resource.getInputStream()).thenReturn(inputStream);
+
+        // 模拟ApplicationContext行为
+        when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
+
+        // 调用方法
+        StateMachine stateMachine = stateMachineFactory.createStateMachineInterfaceFromXml(configLocation);
+
+        // 验证结果是状态机实例
+        assertNotNull(stateMachine);
+        assertEquals("testMachine", stateMachine.getName());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGetStateMachineApiCreationException() throws Exception {
+        // 准备带API接口的XML字符串
+        String xml = "<state-machine name=\"testMachine\">\n" +
+                "  <api>com.jameswushanghai.statemachine.api.NonExistentInterface</api>\n" +
+                "  <state name=\"state1\">\n" +
+                "    <action name=\"action1\" ref=\"testAction\">\n" +
+                "      <next-state response=\"SUCCESS\" state=\"state2\"/>\n" +
+                "    </action>\n" +
+                "  </state>\n" +
+                "</state-machine>";
+
+        // 模拟ApplicationContext行为
+        when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
+
+        // 先创建状态机
+        stateMachineFactory.createStateMachineInterfaceFromXmlString(xml);
+
+        // 尝试获取API代理，预期会抛出RuntimeException
+        stateMachineFactory.getStateMachineApi("testMachine", Object.class);
+    }
+    
+    // 新增测试用例：测试getStateMachine方法传入null名称的情况
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetStateMachineWithNullName() {
+        stateMachineFactory.getStateMachine(null);
+    }
+    
+    // 新增测试用例：测试getStateMachineApi方法传入null名称的情况
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetStateMachineApiWithNullName() {
+        stateMachineFactory.getStateMachineApi(null, DemoStateMachine.class);
+    }
+    
+    // 新增测试用例：测试getStateMachineApi方法传入null接口类型的情况
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetStateMachineApiWithNullType() throws Exception {
+        String xml = "<state-machine name=\"testMachine\">\n" +
+                "  <api>com.jameswushanghai.statemachine.api.DemoStateMachine</api>\n" +
+                "  <state name=\"state1\">\n" +
+                "    <action name=\"action1\" ref=\"testAction\">\n" +
+                "      <next-state response=\"SUCCESS\" state=\"state2\"/>\n" +
+                "    </action>\n" +
+                "  </state>\n" +
+                "</state-machine>";
+        
+        when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
+        stateMachineFactory.createStateMachineInterfaceFromXmlString(xml);
+        
+        stateMachineFactory.getStateMachineApi("testMachine", null);
+    }
+    
+    // 新增测试用例：测试createStateMachine方法在API接口为空字符串时的行为
+    @Test
+    public void testCreateStateMachineWithEmptyApiInterface() throws Exception {
+        // 准备带空API接口的XML字符串
+        String xml = "<state-machine name=\"testMachine\">\n" +
+                "  <api></api>\n" +
+                "  <state name=\"state1\">\n" +
+                "    <action name=\"action1\" ref=\"testAction\">\n" +
+                "      <next-state response=\"SUCCESS\" state=\"state2\"/>\n" +
+                "    </action>\n" +
+                "  </state>\n" +
+                "</state-machine>";
+        
+        // 模拟ApplicationContext行为
+        when(applicationContext.getBean("testAction", Action.class)).thenReturn(new TestAction());
+        
+        // 调用方法
+        Object result = stateMachineFactory.createStateMachineFromXmlString(xml);
+        
+        // 验证返回的是状态机实例而非代理对象
+        assertNotNull(result);
+        assertTrue(result instanceof StateMachine);
+        assertFalse(Proxy.isProxyClass(result.getClass()));
+        assertEquals("testMachine", ((StateMachine) result).getName());
+    }
+    
+    // 新增测试用例：测试getStateMachineApi方法中apiInterface不匹配的情况
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetStateMachineApiInterfaceMismatch() throws Exception {
+        // 创建Mock对象模拟DefaultStateMachine
+        DefaultStateMachine mockStateMachine = mock(DefaultStateMachine.class);
+        StateMachineConfig mockConfig = mock(StateMachineConfig.class);
+        
+        // 设置mock对象的行为
+        when(mockConfig.getApiInterface()).thenReturn("com.example.NonMatchingInterface");
+        when(mockStateMachine.getConfig()).thenReturn(mockConfig);
+        when(mockStateMachine.getName()).thenReturn("testMachine");
+        
+        // 将mockStateMachine添加到stateMachines映射中
+        // 由于stateMachines是私有成员，我们需要通过反射来访问
+        try {
+            java.lang.reflect.Field field = StateMachineFactory.class.getDeclaredField("stateMachines");
+            field.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            Map<String, StateMachine> stateMachines = (Map<String, StateMachine>) field.get(stateMachineFactory);
+            stateMachines.put("testMachine", mockStateMachine);
+        } catch (Exception e) {
+            fail("Failed to set stateMachines field: " + e.getMessage());
+        }
+        
+        // 调用getStateMachineApi方法，传入不匹配的接口类型
+        stateMachineFactory.getStateMachineApi("testMachine", DemoStateMachine.class);
     }
 }

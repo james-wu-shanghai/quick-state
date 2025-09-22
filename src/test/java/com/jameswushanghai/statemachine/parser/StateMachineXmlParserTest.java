@@ -216,4 +216,119 @@ public class StateMachineXmlParserTest {
         assertNotNull(action);
         assertEquals("", action.getRef()); // ref应该为空字符串
     }
+    
+    @Test
+    public void testParseFromStringWithApiContent() throws Exception {
+        // 测试解析包含API接口内容的XML配置
+        String xmlString = "<stateMachine name='apiMachine'>" +
+                "  <api>com.example.TestApi</api>" +
+                "  <state name='S1'/>" +
+                "</stateMachine>";
+        
+        StateMachineConfig config = parser.parseFromString(xmlString);
+        
+        assertNotNull(config);
+        assertEquals("apiMachine", config.getName());
+        assertEquals("com.example.TestApi", config.getApiInterface());
+        assertTrue(config.containsState("S1"));
+    }
+    
+    @Test
+    public void testParseFromStringWithApiAttribute() throws Exception {
+        // 测试解析包含API接口属性的XML配置
+        String xmlString = "<stateMachine name='apiMachine'>" +
+                "  <api interface='com.example.TestApi'/>" +
+                "  <state name='S1'/>" +
+                "</stateMachine>";
+        
+        StateMachineConfig config = parser.parseFromString(xmlString);
+        
+        assertNotNull(config);
+        assertEquals("apiMachine", config.getName());
+        assertEquals("com.example.TestApi", config.getApiInterface());
+        assertTrue(config.containsState("S1"));
+    }
+    
+    @Test
+    public void testParseFromStringWithApiBoth() throws Exception {
+        // 测试解析同时包含API接口内容和属性的XML配置（应该优先使用内容）
+        String xmlString = "<stateMachine name='apiMachine'>" +
+                "  <api interface='com.example.AttributeApi'>com.example.ContentApi</api>" +
+                "  <state name='S1'/>" +
+                "</stateMachine>";
+        
+        StateMachineConfig config = parser.parseFromString(xmlString);
+        
+        assertNotNull(config);
+        assertEquals("apiMachine", config.getName());
+        assertEquals("com.example.ContentApi", config.getApiInterface()); // 应该优先使用内容
+        assertTrue(config.containsState("S1"));
+    }
+    
+    @Test
+    public void testParseFromStringWithApiEmptyContent() throws Exception {
+        // 测试解析API接口内容为空但有属性的XML配置
+        String xmlString = "<stateMachine name='apiMachine'>" +
+                "  <api interface='com.example.TestApi'></api>" +
+                "  <state name='S1'/>" +
+                "</stateMachine>";
+        
+        StateMachineConfig config = parser.parseFromString(xmlString);
+        
+        assertNotNull(config);
+        assertEquals("apiMachine", config.getName());
+        assertEquals("com.example.TestApi", config.getApiInterface()); // 应该使用属性
+        assertTrue(config.containsState("S1"));
+    }
+    
+    @Test
+    public void testParseFromStringWithoutApi() throws Exception {
+        // 测试解析不包含API配置的XML
+        String xmlString = "<stateMachine name='noApiMachine'>" +
+                "  <state name='S1'/>" +
+                "</stateMachine>";
+        
+        StateMachineConfig config = parser.parseFromString(xmlString);
+        
+        assertNotNull(config);
+        assertEquals("noApiMachine", config.getName());
+        assertNull(config.getApiInterface()); // 没有API配置
+        assertTrue(config.containsState("S1"));
+    }
+    
+    @Test
+    public void testParseFromInputStreamWithApi() throws Exception {
+        // 测试从输入流解析包含API接口的XML
+        String xmlContent = "<stateMachine name='streamApiMachine'>" +
+                "  <api>com.example.StreamApi</api>" +
+                "  <state name='S1'/>" +
+                "</stateMachine>";
+        InputStream inputStream = new ByteArrayInputStream(xmlContent.getBytes());
+
+        // 解析XML
+        StateMachineConfig config = parser.parseFromInputStream(inputStream);
+
+        // 验证结果
+        assertNotNull(config);
+        assertEquals("streamApiMachine", config.getName());
+        assertEquals("com.example.StreamApi", config.getApiInterface());
+        assertTrue(config.containsState("S1"));
+    }
+    
+    @Test
+    public void testParseFromStringWithMultipleApiTags() throws Exception {
+        // 测试解析包含多个API标签的XML（应该只取第一个）
+        String xmlString = "<stateMachine name='multiApiMachine'>" +
+                "  <api>com.example.FirstApi</api>" +
+                "  <api>com.example.SecondApi</api>" +
+                "  <state name='S1'/>" +
+                "</stateMachine>";
+        
+        StateMachineConfig config = parser.parseFromString(xmlString);
+        
+        assertNotNull(config);
+        assertEquals("multiApiMachine", config.getName());
+        assertEquals("com.example.FirstApi", config.getApiInterface()); // 应该只取第一个
+        assertTrue(config.containsState("S1"));
+    }
 }

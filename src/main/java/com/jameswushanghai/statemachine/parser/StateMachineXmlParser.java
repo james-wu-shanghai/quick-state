@@ -81,8 +81,18 @@ public class StateMachineXmlParser {
         NodeList apiNodes = root.getElementsByTagName("api");
         if (apiNodes.getLength() > 0) {
             Element apiElement = (Element) apiNodes.item(0);
-            if (apiElement.hasAttribute("interface")) {
-                String apiInterface = apiElement.getAttribute("interface");
+            String apiInterface = null;
+            
+            // 优先从元素内容中获取API接口类名
+            if (apiElement.getTextContent() != null && !apiElement.getTextContent().trim().isEmpty()) {
+                apiInterface = apiElement.getTextContent().trim();
+            }
+            // 如果元素内容为空，则从interface属性获取
+            else if (apiElement.hasAttribute("interface")) {
+                apiInterface = apiElement.getAttribute("interface");
+            }
+            
+            if (apiInterface != null && !apiInterface.isEmpty()) {
                 config.setApiInterface(apiInterface);
             }
         }
