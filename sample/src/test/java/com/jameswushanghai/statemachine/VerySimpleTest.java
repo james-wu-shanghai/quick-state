@@ -4,18 +4,18 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 /**
- * 不依赖任何框架的简单TestNG测试类
+ * Simple TestNG test class without any framework dependencies
  */
 public class VerySimpleTest {
     
     public VerySimpleTest() {
-        // 默认构造函数
-        System.out.println("VerySimpleTest实例化成功");
+        // Default constructor
+        System.out.println("VerySimpleTest instantiated successfully");
     }
     
     @Test
     public void testVerySimple() {
-        System.out.println("测试方法执行");
-        assertTrue(true, "简单测试通过");
+        System.out.println("Test method executed");
+        assertTrue(true, "Simple test passed");
     }
 }

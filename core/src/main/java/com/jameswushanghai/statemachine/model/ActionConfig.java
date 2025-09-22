@@ -3,21 +3,21 @@ package com.jameswushanghai.statemachine.model;
 import java.util.List;
 
 /**
- * 动作配置模型
- * 表示在状态中定义的动作配置
+ * Action configuration model
+ * Represents action configuration defined in a state
  */
 public class ActionConfig {
     
-    // 动作名称
+    // Action name
     private String name;
     
-    // 引用的Spring bean名称
+    // Referenced Spring bean name
     private String ref;
     
-    // 下一个可能的状态列表
+    // List of possible next states
     private List<NextState> nextStates;
     
-    // 是否自动前进到下一个状态
+    // Whether to automatically move to the next state
     private boolean autoMoveForward = false;
 
     // Getter and Setter for name

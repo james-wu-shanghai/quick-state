@@ -9,8 +9,8 @@ import com.jameswushanghai.statemachine.core.Context;
 import com.jameswushanghai.statemachine.action.RetryAction;
 
 /**
- * RetryAction的测试类
- * 测试重试动作的行为和重试计数
+ * Test class for RetryAction
+ * Tests the behavior and retry count of the retry action
  */
 public class RetryActionTest {
     private RetryAction retryAction;
@@ -24,7 +24,7 @@ public class RetryActionTest {
 
     @Test
     public void testDoAction_firstRetry() {
-        // 准备测试数据 - 首次重试，没有设置retryCount
+        // Prepare test data - first retry, no retryCount set
         Context context = new Context();
 
         // 执行测试
@@ -39,7 +39,7 @@ public class RetryActionTest {
 
     @Test
     public void testDoAction_subsequentRetries() {
-        // 准备测试数据 - 已存在retryCount
+        // Prepare test data - retryCount already exists
         Context context = new Context();
         context.set("retryCount", 5);
 
@@ -55,9 +55,10 @@ public class RetryActionTest {
 
     @Test
     public void testDoAction_withExistingContextData() {
-        // 准备测试数据 - 包含现有数据
+        // Prepare test data - containing existing data
         Context context = new Context();
         context.set("existingData", "test_value");
+
 
         // 执行测试
         String result = retryAction.doAction(context);
@@ -72,7 +73,7 @@ public class RetryActionTest {
 
     @Test
     public void testDoAction_invalidRetryCountType() {
-        // 准备测试数据 - 设置非法类型的retryCount
+        // Prepare test data - setting invalid type for retryCount
         Context context = new Context();
         context.set("retryCount", "invalid_type");
 

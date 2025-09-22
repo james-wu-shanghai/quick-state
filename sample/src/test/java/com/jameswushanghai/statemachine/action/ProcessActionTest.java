@@ -9,8 +9,8 @@ import com.jameswushanghai.statemachine.core.Context;
 import com.jameswushanghai.statemachine.action.ProcessAction;
 
 /**
- * ProcessAction的测试类
- * 测试处理动作的行为
+ * Test class for ProcessAction
+ * Tests the behavior of the process action
  */
 public class ProcessActionTest {
     private ProcessAction processAction;
@@ -24,21 +24,22 @@ public class ProcessActionTest {
 
     @Test
     public void testDoAction_basicBehavior() {
-        // 准备测试数据
+        // Prepare test data
         Context context = new Context();
 
-        // 执行测试
+        // Execute test
         String result = processAction.doAction(context);
 
-        // 验证结果
-        assertEquals(result, "DONE", "处理动作应该返回DONE");
-        assertEquals(context.get("action"), "process", "action字段应该被设置为process");
-        assertNotNull(context.get("processTime"), "processTime字段应该被设置");
+        // Verify results
+        assertEquals(result, "DONE", "Process action should return DONE");
+        assertEquals(context.get("action"), "process", "action field should be set to process");
+        assertNotNull(context.get("processTime"), "processTime field should be set");
+
     }
 
     @Test
     public void testDoAction_withExistingContextData() {
-        // 准备测试数据 - 包含现有数据
+        // Prepare test data - containing existing data
         Context context = new Context();
         context.set("existingData", "test_value");
         Long startTime = System.currentTimeMillis();
@@ -47,27 +48,29 @@ public class ProcessActionTest {
         // 执行测试
         String result = processAction.doAction(context);
 
-        // 验证结果
-        assertEquals(result, "DONE", "处理动作应该返回DONE");
-        assertEquals(context.get("action"), "process", "action字段应该被设置为process");
-        assertEquals(context.get("existingData"), "test_value", "现有数据应该保持不变");
-        assertNotNull(context.get("processTime"), "processTime字段应该被设置");
-        assertNotNull(context.get("timestamp"), "timestamp字段应该保持不变");
+        // Verify results
+        assertEquals(result, "DONE", "Process action should return DONE");
+        assertEquals(context.get("action"), "process", "action field should be set to process");
+        assertEquals(context.get("existingData"), "test_value", "Existing data should remain unchanged");
+        assertNotNull(context.get("processTime"), "processTime field should be set");
+        assertNotNull(context.get("timestamp"), "timestamp field should remain unchanged");
+
     }
 
     @Test
     public void testDoAction_threadSleepBehavior() {
-        // 准备测试数据
+        // Prepare test data
         Context context = new Context();
         long beforeTime = System.currentTimeMillis();
 
-        // 执行测试
+
+        // Execute test
         String result = processAction.doAction(context);
         long afterTime = System.currentTimeMillis();
 
-        // 验证结果
-        assertEquals(result, "DONE", "处理动作应该返回DONE");
-        assertTrue(afterTime - beforeTime >= 90, "处理动作应该至少执行约100毫秒");
-        assertNotNull(context.get("processTime"), "processTime字段应该被设置");
+        // Verify results
+        assertEquals(result, "DONE", "Process action should return DONE");
+        assertTrue(afterTime - beforeTime >= 90, "Process action should execute for at least approximately 100 milliseconds");
+        assertNotNull(context.get("processTime"), "processTime field should be set");
     }
 }

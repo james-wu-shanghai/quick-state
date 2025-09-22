@@ -4,8 +4,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 状态机配置类
- * 配置状态机框架的组件扫描和其他配置
+ * State machine configuration class
+ * Configures component scanning and other settings for the state machine framework
  */
 @Configuration
 @ComponentScan({
@@ -15,6 +15,6 @@ import org.springframework.context.annotation.Configuration;
 })
 public class StateMachineConfigurer {
     
-    // 这里可以添加状态机框架的其他配置
-    // 例如：自定义的XML解析器配置、状态机工厂的高级配置等
+    // Additional configurations for the state machine framework can be added here
+    // For example: custom XML parser configuration, advanced state machine factory configuration, etc.
 }

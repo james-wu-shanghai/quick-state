@@ -114,17 +114,17 @@ mvn test
    示例模块提供了`DemoStateMachine`接口，通过状态机代理实现：
    
    ```java
-   // 注入状态机API代理
+   // Inject state machine API proxy
    @Autowired
    private DemoStateMachine demoStateMachine;
    
-   // 创建上下文并设置数据
+   // Create context and set data
    Context context = new Context();
    context.put("inputData", "test data");
    
-   // 调用状态机API执行操作
+   // Call state machine API to execute operation
    String result = demoStateMachine.process(context);
-   System.out.println("状态机执行结果: " + result);
+   System.out.println("State machine execution result: " + result);
    ```
 
 ### 核心模块使用示例
@@ -132,18 +132,18 @@ mvn test
 #### 创建状态机
 
 ```java
-// 从XML配置文件创建状态机
-StateMachineConfig config = StateMachineXmlParser.parse("statemachine/HelloworldStateDefine.xml");
-StateMachine stateMachine = StateMachineFactory.createStateMachine(config);
+// Create state machine from XML configuration file
+   StateMachineConfig config = StateMachineXmlParser.parse("statemachine/HelloworldStateDefine.xml");
+   StateMachine stateMachine = StateMachineFactory.createStateMachine(config);
 
-// 创建上下文
-Context context = new Context();
-context.put("key", "value");
+   // Create context
+   Context context = new Context();
+   context.put("key", "value");
 
-// 触发事件
-String currentState = stateMachine.getCurrentState();
-stateMachine.fireEvent("EVENT_NAME", context);
-String newState = stateMachine.getCurrentState();
+   // Fire event
+   String currentState = stateMachine.getCurrentState();
+   stateMachine.fireEvent("EVENT_NAME", context);
+   String newState = stateMachine.getCurrentState();
 ```
 
 #### 定义自定义动作
@@ -152,13 +152,13 @@ String newState = stateMachine.getCurrentState();
 public class CustomAction implements Action {
     @Override
     public String doAction(Context context) {
-        // 执行自定义业务逻辑
+        // Execute custom business logic
         String input = context.get("inputKey", String.class);
-        // 处理数据
+        // Process data
         String result = processInput(input);
-        // 设置结果到上下文
+        // Set result to context
         context.put("resultKey", result);
-        // 返回状态转换的响应代码
+        // Return response code for state transition
         return "SUCCESS_CODE";
     }
     

@@ -22,7 +22,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.context.ApplicationContext;
 
 /**
- * StateMachineApiProxy的测试类
+ * Test class for StateMachineApiProxy
  */
 public class StateMachineApiProxyTest {
 
@@ -46,7 +46,7 @@ public class StateMachineApiProxyTest {
     }
 
     /**
-     * 测试构造函数正确初始化各个字段
+     * Test that constructor correctly initializes all fields
      */
     @Test
     public void testConstructor() {
@@ -56,7 +56,7 @@ public class StateMachineApiProxyTest {
     }
 
     /**
-     * 测试createProxy方法当apiInterface为null时直接返回stateMachine
+     * Test that createProxy method returns stateMachine directly when apiInterface is null
      */
     @Test
     public void testCreateProxyWithNullApiInterface() throws Exception {
@@ -65,7 +65,7 @@ public class StateMachineApiProxyTest {
     }
 
     /**
-     * 测试createProxy方法当apiInterface为空字符串时直接返回stateMachine
+     * Test that createProxy method returns stateMachine directly when apiInterface is empty string
      */
     @Test
     public void testCreateProxyWithEmptyApiInterface() throws Exception {
@@ -74,7 +74,7 @@ public class StateMachineApiProxyTest {
     }
 
     /**
-     * 测试createProxy方法创建代理对象
+     * Test that createProxy method creates proxy object
      */
     @Test
     public void testCreateProxy() throws Exception {
@@ -101,7 +101,7 @@ public class StateMachineApiProxyTest {
     }
 
     /**
-     * 测试invoke方法处理Object类的方法
+     * Test that invoke method handles methods from Object class
      */
     @Test
     public void testInvokeObjectMethod() throws Throwable {
@@ -118,7 +118,7 @@ public class StateMachineApiProxyTest {
     }
 
     /**
-     * 测试invoke方法当状态机未初始化时抛出异常
+     * Test that invoke method throws exception when state machine is not initialized
      */
     @Test
     public void testInvokeWithUninitializedStateMachine() throws Throwable {
@@ -134,12 +134,12 @@ public class StateMachineApiProxyTest {
             () -> stateMachineApiProxy.invoke(new Object(), testMethod, null)
         );
         
-        // 验证异常消息
-        assertEquals("状态机未初始化，请先调用initialize方法", exception.getMessage());
+        // Verify exception message
+        assertEquals("State machine not initialized, please call initialize method first", exception.getMessage());
     }
 
     /**
-     * 测试invoke方法正常执行动作
+     * Test that invoke method executes actions normally
      */
     @Test
     public void testInvokeNormalExecution() throws Throwable {
@@ -163,7 +163,7 @@ public class StateMachineApiProxyTest {
     }
 
     /**
-     * 测试getStateMachine方法返回正确的状态机实例
+     * Test that getStateMachine method returns the correct state machine instance
      */
     @Test
     public void testGetStateMachine() {
@@ -172,14 +172,14 @@ public class StateMachineApiProxyTest {
     }
 
     /**
-     * 用于测试的接口
+     * Interface for testing
      */
     public interface TestInterface {
         void testMethod();
     }
     
     /**
-     * 测试invoke方法处理带有参数的方法调用
+     * Test that invoke method handles method calls with parameters
      */
     @Test
     public void testInvokeWithParameters() throws Throwable {
@@ -203,7 +203,7 @@ public class StateMachineApiProxyTest {
     }
     
     /**
-     * 测试createProxy方法创建多个不同的代理对象
+     * Test that createProxy method creates multiple different proxy objects
      */
     @Test
     public void testCreateMultipleProxies() throws Exception {
@@ -228,14 +228,14 @@ public class StateMachineApiProxyTest {
     }
     
     /**
-     * 测试invoke方法处理异常情况
+     * Test that invoke method handles exception situations
      */
     @Test
     public void testInvokeWithException() throws Throwable {
         // 模拟状态机已初始化
         when(stateMachine.getCurrentState()).thenReturn("INIT");
-        // 模拟execute方法抛出异常
-        RuntimeException expectedException = new RuntimeException("模拟执行异常");
+        // Mock execute method to throw exception
+        RuntimeException expectedException = new RuntimeException("Simulated execution exception");
         doThrow(expectedException).when(stateMachine).execute(anyString(), any(Context.class));
         
         // 获取测试方法
@@ -252,7 +252,7 @@ public class StateMachineApiProxyTest {
     }
     
     /**
-     * 测试createProxy方法在加载无效接口时的异常处理
+     * Test exception handling when createProxy method loads invalid interface
      */
     @Test
     public void testCreateProxyWithInvalidInterface() {
@@ -261,12 +261,12 @@ public class StateMachineApiProxyTest {
             StateMachineApiProxy.createProxy(stateMachine, applicationContext, "non.existent.Interface");
         });
         
-        // 验证异常消息包含类名
-        assertTrue(exception.getMessage().contains("无法加载API接口类"));
+        // Verify exception message contains class name
+        assertTrue(exception.getMessage().contains("Unable to load API interface class"));
     }
     
     /**
-     * 用于测试带参数方法调用的接口
+     * Interface for testing method calls with parameters
      */
     public interface TestInterfaceWithParams {
         void methodWithParams(String param1, int param2);

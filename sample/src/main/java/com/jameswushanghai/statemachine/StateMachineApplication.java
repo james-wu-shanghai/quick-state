@@ -14,8 +14,8 @@ import com.jameswushanghai.statemachine.core.StateMachine;
 import com.jameswushanghai.statemachine.core.StateMachineFactory;
 
 /**
- * 状态机示例应用程序
- * 用于演示如何使用状态机框架创建和执行状态机
+ * State machine sample application
+ * Demonstrates how to create and execute state machines using the state machine framework
  */
 @SpringBootApplication
 public class StateMachineApplication implements CommandLineRunner {
@@ -25,63 +25,63 @@ public class StateMachineApplication implements CommandLineRunner {
     private StateMachineFactory stateMachineFactory;
     
     public static void main(String[] args) {
-        log.info("启动状态机示例应用程序");
+        log.info("Starting state machine sample application");
         ConfigurableApplicationContext context = SpringApplication.run(StateMachineApplication.class, args);
         SpringApplication.exit(context);
     }
     
     @Override
     public void run(String... args) throws Exception {
-        log.info("开始演示状态机的使用");
+        log.info("Starting demonstration of state machine usage");
         
-        // 从XML配置创建状态机（这会自动返回API代理对象）
+        // Create state machine from XML configuration (this automatically returns API proxy object)
         DemoStateMachine demoStateMachine = (DemoStateMachine) stateMachineFactory.createStateMachineFromXml("classpath:demo-state-machine.xml");
-        log.info("状态机创建成功");
+        log.info("State machine created successfully");
         
-        // 执行状态机操作
-        log.info("执行状态机的start方法");
+        // Execute state machine operations
+        log.info("Executing start method of state machine");
         demoStateMachine.start();
         
-        // 获取原始状态机实例以查看当前状态
+        // Get original state machine instance to view current state
         StateMachine stateMachine = stateMachineFactory.getStateMachine("demoMachine");
-        log.info("start方法执行后的状态: {}", stateMachine.getCurrentState());
+        log.info("State after executing start method: {}", stateMachine.getCurrentState());
         
-        // 执行重试操作
-        log.info("执行状态机的retry方法");
+        // Execute retry operation
+        log.info("Executing retry method of state machine");
         demoStateMachine.retry();
-        log.info("retry方法执行后的状态: {}", stateMachine.getCurrentState());
+        log.info("State after executing retry method: {}", stateMachine.getCurrentState());
         
-        // 演示如何创建和使用上下文
-        log.info("演示上下文的使用");
+        // Demonstrate how to create and use context
+        log.info("Demonstrating context usage");
         Context context = new Context();
         context.set("firstExecution", true);
         
-        // 直接使用状态机接口执行动作
+        // Directly use state machine interface to execute action
         stateMachine.initialize("INIT");
         String newState = stateMachine.execute("start", context);
-        log.info("直接执行start动作后的状态: {}", newState);
+        log.info("State after directly executing start action: {}", newState);
         
-        // 演示autoMoveForward功能
-        log.info("\n==== 演示autoMoveForward功能 ====");
+        // Demonstrate autoMoveForward functionality
+        log.info("\n==== Demonstrating autoMoveForward functionality ====");
         
-        // 创建使用autoMoveForward功能的状态机
+        // Create state machine with autoMoveForward functionality
         StateMachine autoMoveMachine = (StateMachine) stateMachineFactory.createStateMachineFromXml("classpath:auto-move-forward-demo.xml");
-        log.info("自动前进状态机创建成功");
+        log.info("Auto move forward state machine created successfully");
         
-        // 初始化状态机
+        // Initialize state machine
         autoMoveMachine.initialize("INIT");
-        log.info("自动前进状态机初始状态: {}", autoMoveMachine.getCurrentState());
+        log.info("Initial state of auto move forward state machine: {}", autoMoveMachine.getCurrentState());
         
-        // 执行start动作，由于autoMoveForward="true"，应该会自动执行下一个状态的动作
-        log.info("执行start动作，开启自动前进流程");
+        // Execute start action, due to autoMoveForward="true", it should automatically execute next state's actions
+        log.info("Executing start action to begin auto forward process");
         Context autoContext = new Context();
-        autoContext.set("firstExecution", false); // 设置为不是第一次执行，确保start动作返回SUCCESS
+        autoContext.set("firstExecution", false); // Set to not first execution to ensure start action returns SUCCESS
         String finalState = autoMoveMachine.execute("start", autoContext);
         
-        // 验证最终状态，由于autoMoveForward功能，应该已经到达COMPLETED状态
-        log.info("autoMoveForward流程执行后的最终状态: {}", finalState);
-        log.info("autoMoveForward功能演示完成");
+        // Verify final state, due to autoMoveForward functionality, it should have reached COMPLETED state
+        log.info("Final state after autoMoveForward process: {}", finalState);
+        log.info("AutoMoveForward functionality demonstration completed");
         
-        log.info("\n状态机示例演示完成");
+        log.info("\nState machine sample demonstration completed");
     }
 }

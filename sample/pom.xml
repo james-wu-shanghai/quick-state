@@ -12,7 +12,7 @@
     <packaging>jar</packaging>
 
     <dependencies>
-        <!-- 依赖于core模块 -->
+        <!-- Depends on core module -->
         <dependency>
             <groupId>com.jameswushanghai</groupId>
             <artifactId>state.machine.core</artifactId>
@@ -54,7 +54,7 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
         </dependency>
-        <!-- 测试依赖 -->
+        <!-- Test Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -95,7 +95,7 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.10</version>
-                <!-- 禁用JaCoCo以解决Java 24兼容性问题 -->
+                <!-- Disable JaCoCo to resolve Java 24 compatibility issues -->
                 <executions>
                     <execution>
                         <phase>none</phase>
@@ -103,7 +103,7 @@
                 </executions>
             </plugin>
             
-            <!-- 配置Surefire插件使用TestNG -->
+            <!-- Configure Surefire plugin to use TestNG -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -111,18 +111,18 @@
                 <configuration>
                     <testNGArtifactName>org.testng:testng</testNGArtifactName>
                     <useManifestOnlyJar>false</useManifestOnlyJar>
-                    <!-- 明确指定使用TestNG提供程序 -->
+                    <!-- Explicitly specify to use TestNG provider -->
                     <properties>
                         <property>
                             <name>testng</name>
                             <value>true</value>
                         </property>
                     </properties>
-                    <!-- 指定测试类 -->
+                    <!-- Specify test classes -->
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
-                    <!-- 排除StateMachineApplicationTest因为它有实例化问题 -->
+                    <!-- Exclude StateMachineApplicationTest due to instantiation issues -->
                     <excludes>
                         <exclude>**/StateMachineApplicationTest.java</exclude>
                     </excludes>

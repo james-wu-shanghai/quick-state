@@ -8,8 +8,8 @@ import com.jameswushanghai.statemachine.core.Action;
 import com.jameswushanghai.statemachine.core.Context;
 
 /**
- * 完成动作实现类
- * 实现Action接口，处理complete动作并返回响应码
+ * Complete action implementation class
+ * Implements Action interface to handle complete action and return response code
  */
 @Component("completeAction")
 public class CompleteAction implements Action {
@@ -17,32 +17,32 @@ public class CompleteAction implements Action {
     
     @Override
     public String doAction(Context context) {
-        log.info("执行完成动作");
-        // 添加完成动作的逻辑
+        log.info("Executing complete action");
+        // Add logic for complete action
         context.set("action", "complete");
         context.set("completeTime", System.currentTimeMillis());
         
-        // 获取处理过程中的信息
+        // Get information from the processing
         Object startTimeObj = context.get("timestamp");
         Object processTimeObj = context.get("processTime");
         
         if (startTimeObj != null && processTimeObj != null) {
             try {
-                // 尝试将时间戳转换为Long类型
+                // Try to convert timestamps to Long type
                 long startTime = convertToLong(startTimeObj);
                 long processTime = convertToLong(processTimeObj);
                 long totalTime = (Long) context.get("completeTime") - startTime;
                 long processingTime = processTime - startTime;
                 
-                log.info("整个流程耗时: {}ms", totalTime);
-                log.info("处理阶段耗时: {}ms", processingTime);
+                log.info("Total process time: {}ms", totalTime);
+                log.info("Processing stage time: {}ms", processingTime);
             } catch (NumberFormatException | ClassCastException e) {
-                // 处理类型转换错误
-                log.warn("无法计算流程耗时，时间戳格式不正确: {}", e.getMessage());
+                // Handle type conversion errors
+                log.warn("Unable to calculate process time, timestamp format is incorrect: {}", e.getMessage());
             }
         }
         
-        log.info("任务已成功完成");
+        log.info("Task has been successfully completed");
         return "SUCCESS";
     }
     

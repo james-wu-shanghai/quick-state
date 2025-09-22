@@ -8,8 +8,8 @@ import com.jameswushanghai.statemachine.core.Action;
 import com.jameswushanghai.statemachine.core.Context;
 
 /**
- * 处理动作实现类
- * 实现Action接口，处理process动作并返回响应码
+ * Process action implementation class
+ * Implements Action interface to handle process action and return response code
  */
 @Component("processAction")
 public class ProcessAction implements Action {
@@ -17,20 +17,20 @@ public class ProcessAction implements Action {
     
     @Override
     public String doAction(Context context) {
-        log.info("执行处理动作");
-        // 添加处理动作的逻辑
+        log.info("Executing process action");
+        // Add logic for process action
         context.set("action", "process");
         context.set("processTime", System.currentTimeMillis());
         
-        // 模拟处理过程
-        log.info("正在处理数据...");
+        // Simulate processing
+        log.info("Processing data...");
         try {
-            Thread.sleep(100); // 模拟处理时间
+            Thread.sleep(100); // Simulate processing time
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         
-        log.info("处理完成，准备进入下一阶段");
+        log.info("Processing completed, ready to proceed to next stage");
         return "DONE";
     }
 }

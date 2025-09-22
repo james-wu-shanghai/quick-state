@@ -10,10 +10,11 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
     
-    <!-- 添加modules配置 -->
+    <!-- Add modules configuration -->
     <modules>
         <module>core</module>
         <module>sample</module>
+        <module>persist</module>
     </modules>
 
     <parent>

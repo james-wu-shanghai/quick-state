@@ -5,50 +5,50 @@ import java.util.HashMap;
 import java.util.Collections;
 
 /**
- * 状态机配置模型
- * 表示整个状态机的配置信息
+ * State machine configuration model
+ * Represents configuration information for the entire state machine
  */
 public class StateMachineConfig {
 
-    // API接口类名
+    // API interface class name
     private String apiInterface;
 
     
-    // 状态机名称
+    // State machine name
     private String name;
     
-    // 存储所有状态配置的Map，键为状态名称
+    // Map to store all state configurations, key is state name
     private Map<String, StateConfig> states = new HashMap<>();
     
     /**
-     * 添加状态配置
-     * @param stateConfig 状态配置
+     * Add state configuration
+     * @param stateConfig State configuration
      */
     public void addState(StateConfig stateConfig) {
         states.put(stateConfig.getName(), stateConfig);
     }
     
     /**
-     * 根据状态名称获取状态配置
-     * @param stateName 状态名称
-     * @return 状态配置，如果找不到返回null
+     * Get state configuration by state name
+     * @param stateName State name
+     * @return State configuration, returns null if not found
      */
     public StateConfig getState(String stateName) {
         return states.get(stateName);
     }
     
     /**
-     * 检查是否包含指定名称的状态
-     * @param stateName 状态名称
-     * @return 是否包含
+     * Check if contains a state with the specified name
+     * @param stateName State name
+     * @return Whether it contains
      */
     public boolean containsState(String stateName) {
         return states.containsKey(stateName);
     }
     
     /**
-     * 获取状态数量
-     * @return 状态数量
+     * Get the number of states
+     * @return Number of states
      */
     public int getStateCount() {
         return states.size();

@@ -8,8 +8,8 @@ import com.jameswushanghai.statemachine.core.Action;
 import com.jameswushanghai.statemachine.core.Context;
 
 /**
- * 开始动作实现类
- * 实现Action接口，处理start动作并返回响应码
+ * Start action implementation class
+ * Implements Action interface to handle start action and return response code
  */
 @Component("startAction")
 public class StartAction implements Action {
@@ -17,22 +17,22 @@ public class StartAction implements Action {
     
     @Override
     public String doAction(Context context) {
-        log.info("执行开始动作");
-        // 添加开始动作的逻辑
+        log.info("Executing start action");
+        // Add logic for start action
         context.set("action", "start");
         context.set("timestamp", System.currentTimeMillis());
         
-        // 检查是否是第一次执行，如果是则返回失败，否则返回成功
+        // Check if it's the first execution, return FAILED if yes, SUCCESS otherwise
         boolean firstExecution = context.getOrDefault("firstExecution", false) instanceof Boolean && 
                                  (Boolean) context.getOrDefault("firstExecution", false);
         
         if (firstExecution) {
-            log.info("第一次执行start动作，返回失败");
-            // 重置标志，确保下次调用成功
+            log.info("First execution of start action, returning FAILED");
+            // Reset flag to ensure next call succeeds
             context.set("firstExecution", false);
             return "FAILED";
         } else {
-            log.info("非第一次执行start动作，返回成功");
+            log.info("Not the first execution of start action, returning SUCCESS");
             return "SUCCESS";
         }
     }

@@ -11,30 +11,30 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
- * 状态机API代理类
- * 用于创建状态机API接口的代理对象，将方法调用转发到对应的action
+ * State machine API proxy class
+ * Used to create proxy objects for state machine API interfaces and forward method calls to corresponding actions
  */
 public class StateMachineApiProxy implements InvocationHandler {
 
     private static final Logger log = LoggerFactory.getLogger(StateMachineApiProxy.class);
     
-    // 状态机实例
+    // State machine instance
     private final StateMachine stateMachine;
     
-    // Spring应用上下文
+    // Spring application context
     private final ApplicationContext applicationContext;
     
-    // 上下文对象
+    // Context object
     private final Context context;
     
-    // 缓存接口类
+    // Interface class cache
     private static final Map<String, Class<?>> INTERFACE_CACHE = new ConcurrentHashMap<>();
 
     /**
-     * 构造函数
-     * @param stateMachine 状态机实例
-     * @param applicationContext Spring应用上下文
-     * @param context 上下文对象
+     * Constructor
+     * @param stateMachine State machine instance
+     * @param applicationContext Spring application context
+     * @param context Context object
      */
     public StateMachineApiProxy(StateMachine stateMachine, ApplicationContext applicationContext, Context context) {
         this.stateMachine = stateMachine;
@@ -43,12 +43,12 @@ public class StateMachineApiProxy implements InvocationHandler {
     }
 
     /**
-     * 创建API代理对象
-     * @param stateMachine 状态机实例
-     * @param applicationContext Spring应用上下文
-     * @param apiInterface API接口类名
-     * @return 代理对象
-     * @throws Exception 创建异常
+     * Create API proxy object
+     * @param stateMachine State machine instance
+     * @param applicationContext Spring application context
+     * @param apiInterface API interface class name
+     * @return Proxy object
+     * @throws Exception Creation exception
      */
     public static Object createProxy(StateMachine stateMachine, ApplicationContext applicationContext, String apiInterface) throws Exception {
         if (apiInterface == null || apiInterface.isEmpty()) {
@@ -71,17 +71,17 @@ public class StateMachineApiProxy implements InvocationHandler {
     }
 
     /**
-     * 加载接口类
-     * @param apiInterface 接口类名
-     * @return 接口类
-     * @throws ClassNotFoundException 类未找到异常
+     * Load interface class
+     * @param apiInterface Interface class name
+     * @return Interface class
+     * @throws ClassNotFoundException Class not found exception
      */
     private static Class<?> loadInterfaceClass(String apiInterface) throws ClassNotFoundException {
         return INTERFACE_CACHE.computeIfAbsent(apiInterface, className -> {
             try {
                 return Class.forName(className);
             } catch (ClassNotFoundException e) {
-                throw new RuntimeException("无法加载API接口类: " + className, e);
+                throw new RuntimeException("Unable to load API interface class: " + className, e);
             }
         });
     }
@@ -104,9 +104,9 @@ public class StateMachineApiProxy implements InvocationHandler {
         String actionName = method.getName();
         log.debug("调用状态机API方法: {}", actionName);
         
-        // 如果状态机未初始化，抛出异常
+        // If state machine is not initialized, throw exception
         if (stateMachine.getCurrentState() == null) {
-            throw new IllegalStateException("状态机未初始化，请先调用initialize方法");
+            throw new IllegalStateException("State machine not initialized, please call initialize method first");
         }
         
         // 执行动作
@@ -118,8 +118,8 @@ public class StateMachineApiProxy implements InvocationHandler {
     }
     
     /**
-     * 获取内部的状态机实例
-     * @return 状态机实例
+     * Get the internal state machine instance
+     * @return State machine instance
      */
     public StateMachine getStateMachine() {
         return stateMachine;
