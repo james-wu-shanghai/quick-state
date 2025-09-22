@@ -1,10 +1,12 @@
 package com.jameswushanghai.statemachine.api;
 
+import com.jameswushanghai.statemachine.core.StateMachine;
+
 /**
  * 演示状态机API接口
  * 提供start和retry方法用于控制状态机的执行流程
  */
-public interface DemoStateMachine {
+public interface DemoStateMachine extends StateMachine {
     /**
      * 启动状态机
      * @return 当前状态机实例，支持链式调用

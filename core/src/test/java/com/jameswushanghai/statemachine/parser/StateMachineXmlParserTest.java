@@ -331,4 +331,67 @@ public class StateMachineXmlParserTest {
         assertEquals("com.example.FirstApi", config.getApiInterface()); // 应该只取第一个
         assertTrue(config.containsState("S1"));
     }
+    
+    @Test
+    public void testParseFromStringWithAutoMoveForwardTrue() throws Exception {
+        // 测试解析包含autoMoveForward="true"属性的XML配置
+        String xmlString = "<stateMachine name='testMachine'>" +
+                "  <state name='S1'>" +
+                "    <action name='A1' ref='action1' autoMoveForward='true'>" +
+                "      <nextState respCode='SUCCESS' state='S2'/>" +
+                "    </action>" +
+                "  </state>" +
+                "  <state name='S2'/>" +
+                "</stateMachine>";
+        
+        StateMachineConfig config = parser.parseFromString(xmlString);
+        
+        assertNotNull(config);
+        StateConfig s1 = config.getState("S1");
+        ActionConfig action = s1.findAction("A1");
+        assertNotNull(action);
+        assertTrue(action.isAutoMoveForward());
+    }
+    
+    @Test
+    public void testParseFromStringWithAutoMoveForwardFalse() throws Exception {
+        // 测试解析包含autoMoveForward="false"属性的XML配置
+        String xmlString = "<stateMachine name='testMachine'>" +
+                "  <state name='S1'>" +
+                "    <action name='A1' ref='action1' autoMoveForward='false'>" +
+                "      <nextState respCode='SUCCESS' state='S2'/>" +
+                "    </action>" +
+                "  </state>" +
+                "  <state name='S2'/>" +
+                "</stateMachine>";
+        
+        StateMachineConfig config = parser.parseFromString(xmlString);
+        
+        assertNotNull(config);
+        StateConfig s1 = config.getState("S1");
+        ActionConfig action = s1.findAction("A1");
+        assertNotNull(action);
+        assertFalse(action.isAutoMoveForward());
+    }
+    
+    @Test
+    public void testParseFromStringWithoutAutoMoveForward() throws Exception {
+        // 测试解析不包含autoMoveForward属性的XML配置（默认应该是false）
+        String xmlString = "<stateMachine name='testMachine'>" +
+                "  <state name='S1'>" +
+                "    <action name='A1' ref='action1'>" +
+                "      <nextState respCode='SUCCESS' state='S2'/>" +
+                "    </action>" +
+                "  </state>" +
+                "  <state name='S2'/>" +
+                "</stateMachine>";
+        
+        StateMachineConfig config = parser.parseFromString(xmlString);
+        
+        assertNotNull(config);
+        StateConfig s1 = config.getState("S1");
+        ActionConfig action = s1.findAction("A1");
+        assertNotNull(action);
+        assertFalse(action.isAutoMoveForward()); // 默认应该是false
+    }
 }

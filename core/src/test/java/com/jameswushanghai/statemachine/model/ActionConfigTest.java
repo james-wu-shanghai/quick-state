@@ -139,4 +139,30 @@ public class ActionConfigTest {
         assertNotNull(actionConfig.getNextStates());
         assertTrue(actionConfig.getNextStates().isEmpty());
     }
+    
+    @Test
+    public void testAutoMoveForwardDefaultValue() {
+        // 测试autoMoveForward的默认值
+        assertFalse(actionConfig.isAutoMoveForward());
+    }
+    
+    @Test
+    public void testSetAndGetAutoMoveForwardTrue() {
+        // 测试设置和获取autoMoveForward为true
+        actionConfig.setAutoMoveForward(true);
+        assertTrue(actionConfig.isAutoMoveForward());
+    }
+    
+    @Test
+    public void testSetAndGetAutoMoveForwardFalse() {
+        // 测试设置和获取autoMoveForward为false
+        actionConfig.setAutoMoveForward(false);
+        assertFalse(actionConfig.isAutoMoveForward());
+        
+        // 先设置为true，再设置为false
+        actionConfig.setAutoMoveForward(true);
+        assertTrue(actionConfig.isAutoMoveForward());
+        actionConfig.setAutoMoveForward(false);
+        assertFalse(actionConfig.isAutoMoveForward());
+    }
 }

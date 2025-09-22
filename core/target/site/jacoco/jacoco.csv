@@ -1,0 +1,11 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+state.machine.core,com.jameswushanghai.statemachine.core,Context,73,20,6,0,14,5,9,3,6,3
+state.machine.core,com.jameswushanghai.statemachine.core,StateMachineApiProxy,11,118,1,9,2,29,1,11,0,7
+state.machine.core,com.jameswushanghai.statemachine.core,StateMachineFactory,223,4,20,0,53,1,19,1,9,1
+state.machine.core,com.jameswushanghai.statemachine.core,DefaultStateMachine,298,0,36,0,62,0,33,0,15,0
+state.machine.core,com.jameswushanghai.statemachine.config,StateMachineConfigurer,3,0,0,0,1,0,1,0,1,0
+state.machine.core,com.jameswushanghai.statemachine.model,NextState,17,0,0,0,7,0,5,0,5,0
+state.machine.core,com.jameswushanghai.statemachine.model,StateConfig,56,0,12,0,15,0,13,0,7,0
+state.machine.core,com.jameswushanghai.statemachine.model,ActionConfig,34,0,0,0,14,0,9,0,9,0
+state.machine.core,com.jameswushanghai.statemachine.model,StateMachineConfig,59,0,2,0,16,0,12,0,11,0
+state.machine.core,com.jameswushanghai.statemachine.parser,StateMachineXmlParser,259,0,26,0,61,0,19,0,6,0

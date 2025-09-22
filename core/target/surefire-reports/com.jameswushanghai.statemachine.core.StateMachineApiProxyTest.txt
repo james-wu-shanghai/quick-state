@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.jameswushanghai.statemachine.core.StateMachineApiProxyTest
 -------------------------------------------------------------------------------
-Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.21 s - in com.jameswushanghai.statemachine.core.StateMachineApiProxyTest
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.194 s - in com.jameswushanghai.statemachine.core.StateMachineApiProxyTest

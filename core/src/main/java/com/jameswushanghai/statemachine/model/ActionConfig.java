@@ -16,6 +16,9 @@ public class ActionConfig {
     
     // 下一个可能的状态列表
     private List<NextState> nextStates;
+    
+    // 是否自动前进到下一个状态
+    private boolean autoMoveForward = false;
 
     // Getter and Setter for name
     public String getName() {
@@ -42,5 +45,14 @@ public class ActionConfig {
 
     public void setNextStates(List<NextState> nextStates) {
         this.nextStates = nextStates;
+    }
+    
+    // Getter and Setter for autoMoveForward
+    public boolean isAutoMoveForward() {
+        return autoMoveForward;
+    }
+    
+    public void setAutoMoveForward(boolean autoMoveForward) {
+        this.autoMoveForward = autoMoveForward;
     }
 }

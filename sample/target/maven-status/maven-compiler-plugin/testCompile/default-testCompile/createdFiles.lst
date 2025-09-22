@@ -1,0 +1,6 @@
+com\jameswushanghai\statemachine\VerySimpleTest.class
+com\jameswushanghai\statemachine\action\StartActionTest.class
+com\jameswushanghai\statemachine\SimpleTest.class
+com\jameswushanghai\statemachine\action\CompleteActionTest.class
+com\jameswushanghai\statemachine\action\ProcessActionTest.class
+com\jameswushanghai\statemachine\action\RetryActionTest.class

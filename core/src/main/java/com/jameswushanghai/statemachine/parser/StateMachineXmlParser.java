@@ -143,6 +143,11 @@ public class StateMachineXmlParser {
         actionConfig.setName(actionElement.getAttribute("name"));
         actionConfig.setRef(actionElement.getAttribute("ref"));
         
+        // 解析autoMoveForward属性，如果存在则设置
+        if (actionElement.hasAttribute("autoMoveForward")) {
+            actionConfig.setAutoMoveForward(Boolean.parseBoolean(actionElement.getAttribute("autoMoveForward")));
+        }
+        
         // 解析下一个状态
         NodeList nextStateNodes = actionElement.getElementsByTagName("nextState");
         for (int i = 0; i < nextStateNodes.getLength(); i++) {

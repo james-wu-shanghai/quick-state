@@ -61,6 +61,27 @@ public class StateMachineApplication implements CommandLineRunner {
         String newState = stateMachine.execute("start", context);
         log.info("直接执行start动作后的状态: {}", newState);
         
-        log.info("状态机示例演示完成");
+        // 演示autoMoveForward功能
+        log.info("\n==== 演示autoMoveForward功能 ====");
+        
+        // 创建使用autoMoveForward功能的状态机
+        StateMachine autoMoveMachine = (StateMachine) stateMachineFactory.createStateMachineFromXml("classpath:auto-move-forward-demo.xml");
+        log.info("自动前进状态机创建成功");
+        
+        // 初始化状态机
+        autoMoveMachine.initialize("INIT");
+        log.info("自动前进状态机初始状态: {}", autoMoveMachine.getCurrentState());
+        
+        // 执行start动作，由于autoMoveForward="true"，应该会自动执行下一个状态的动作
+        log.info("执行start动作，开启自动前进流程");
+        Context autoContext = new Context();
+        autoContext.set("firstExecution", false); // 设置为不是第一次执行，确保start动作返回SUCCESS
+        String finalState = autoMoveMachine.execute("start", autoContext);
+        
+        // 验证最终状态，由于autoMoveForward功能，应该已经到达COMPLETED状态
+        log.info("autoMoveForward流程执行后的最终状态: {}", finalState);
+        log.info("autoMoveForward功能演示完成");
+        
+        log.info("\n状态机示例演示完成");
     }
 }

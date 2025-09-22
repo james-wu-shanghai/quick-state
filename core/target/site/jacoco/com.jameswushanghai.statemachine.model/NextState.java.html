@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NextState.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">state.machine.core</a> &gt; <a href="index.source.html" class="el_package">com.jameswushanghai.statemachine.model</a> &gt; <span class="el_source">NextState.java</span></div><h1>NextState.java</h1><pre class="source lang-java linenums">package com.jameswushanghai.statemachine.model;
+
+/**
+ * 下一个状态模型
+ * 表示从当前状态执行动作后可能转换到的下一个状态
+ */
+<span class="nc" id="L7">public class NextState {</span>
+    
+    // 响应代码，与动作返回值匹配
+    private String respCode;
+    
+    // 目标状态名称
+    private String state;
+
+    // Getter and Setter for respCode
+    public String getRespCode() {
+<span class="nc" id="L17">        return respCode;</span>
+    }
+
+    public void setRespCode(String respCode) {
+<span class="nc" id="L21">        this.respCode = respCode;</span>
+<span class="nc" id="L22">    }</span>
+
+    // Getter and Setter for state
+    public String getState() {
+<span class="nc" id="L26">        return state;</span>
+    }
+
+    public void setState(String state) {
+<span class="nc" id="L30">        this.state = state;</span>
+<span class="nc" id="L31">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

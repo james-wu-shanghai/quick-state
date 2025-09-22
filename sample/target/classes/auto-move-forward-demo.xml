@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    自动前进状态机配置文件
+    演示autoMoveForward功能的使用
+-->
+<state-machine name="autoMoveForwardMachine">
+    <!-- 定义初始状态 -->
+    <state name="INIT">
+        <!-- start动作，设置autoMoveForward="true"，当执行完后会自动执行下一个状态的唯一动作 -->
+        <action name="start" ref="startAction" autoMoveForward="true">
+            <next-state response="SUCCESS" state="PROCESSING"/>
+            <next-state response="FAILED" state="FAIL"/>
+        </action>
+    </state>
+    
+    <!-- 定义处理状态 -->
+    <state name="PROCESSING">
+        <!-- 这个状态只有一个动作，当从INIT状态自动进入时会自动执行 -->
+        <action name="process" ref="processAction">
+            <next-state response="DONE" state="COMPLETING"/>
+        </action>
+    </state>
+    
+    <!-- 定义完成状态 -->
+    <state name="COMPLETING">
+        <!-- complete动作，也设置autoMoveForward="true" -->
+        <action name="complete" ref="completeAction" autoMoveForward="true">
+            <next-state response="SUCCESS" state="COMPLETED"/>
+        </action>
+    </state>
+    
+    <!-- 定义成功状态 -->
+    <state name="COMPLETED">
+        <!-- 完成状态是终态，没有定义任何动作 -->
+    </state>
+    
+    <!-- 定义失败状态 -->
+    <state name="FAIL">
+        <!-- 在失败状态下可以执行retry动作 -->
+        <action name="retry" ref="retryAction">
+            <next-state response="SUCCESS" state="PROCESSING"/>
+        </action>
+    </state>
+</state-machine>

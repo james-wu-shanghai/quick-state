@@ -1,7 +1,12 @@
 package com.jameswushanghai.statemachine.core;
 
-import com.jameswushanghai.statemachine.model.StateMachineConfig;
-import com.jameswushanghai.statemachine.parser.StateMachineXmlParser;
+import java.io.IOException;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -9,13 +14,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.Map;
+import com.jameswushanghai.statemachine.model.StateMachineConfig;
+import com.jameswushanghai.statemachine.parser.StateMachineXmlParser;
 
 /**
  * 状态机工厂
@@ -109,8 +110,8 @@ public class StateMachineFactory implements InitializingBean {
      */
     public StateMachine createStateMachineInterfaceFromXml(String configLocation) throws Exception {
         Object machine = createStateMachineFromXml(configLocation);
-        if (machine instanceof StateMachine) {
-            return (StateMachine) machine;
+        if (machine instanceof StateMachine stateMachine) {
+            return stateMachine;
         }
         // 如果返回的是代理对象，从内部获取StateMachine实例
         return ((StateMachineApiProxy)Proxy.getInvocationHandler(machine)).getStateMachine();
@@ -144,8 +145,8 @@ public class StateMachineFactory implements InitializingBean {
      */
     public StateMachine createStateMachineInterfaceFromXmlString(String xmlString) throws Exception {
         Object machine = createStateMachineFromXmlString(xmlString);
-        if (machine instanceof StateMachine) {
-            return (StateMachine) machine;
+        if (machine instanceof StateMachine stateMachine) {
+            return stateMachine;
         }
         // 如果返回的是代理对象，从内部获取StateMachine实例
         return ((StateMachineApiProxy)Proxy.getInvocationHandler(machine)).getStateMachine();

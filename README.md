@@ -166,7 +166,8 @@ public class CustomAction implements Action {
         // 实现具体的业务逻辑
         return "processed_" + input;
     }
-}```
+}
+```
 
 ## 注意事项
 - 确保所有状态机配置文件放在 `resources/statemachine/` 目录下
@@ -179,3 +180,28 @@ public class CustomAction implements Action {
 - 增强状态机监控和日志功能
 - 支持分布式状态管理
 - 提供更多开箱即用的示例和模板
+
+## 提交代码到GitHub
+
+以下是将代码提交到GitHub的基本步骤：
+
+1. **添加修改的文件**
+   ```bash
+git add .
+```
+
+2. **提交更改**
+   ```bash
+git commit -m "更新README.md文档"
+```
+
+3. **推送到远程仓库**
+   ```bash
+git push origin master
+```
+
+> 注意：如果是第一次提交，需要先配置远程仓库地址：
+> ```bash
+> git remote add origin <your-github-repo-url>
+> git push -u origin master
+> ```

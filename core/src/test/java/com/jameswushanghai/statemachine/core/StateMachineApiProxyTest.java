@@ -1,16 +1,25 @@
 package com.jameswushanghai.statemachine.core;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.context.ApplicationContext;
-
 import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.MockitoAnnotations;
+import org.springframework.context.ApplicationContext;
 
 /**
  * StateMachineApiProxy的测试类
@@ -69,32 +78,26 @@ public class StateMachineApiProxyTest {
      */
     @Test
     public void testCreateProxy() throws Exception {
-        // 使用DemoStateMachine接口来测试
-        String apiInterface = "com.jameswushanghai.statemachine.api.DemoStateMachine";
-        
+        // 由于DemoStateMachine现在继承了StateMachine，这里使用自定义的简单测试接口
         // 模拟状态机行为
         when(stateMachine.getCurrentState()).thenReturn("INIT");
         when(stateMachine.execute(anyString(), any(Context.class))).thenReturn("SUCCESS");
         
         // 创建代理对象
-        Object proxy = StateMachineApiProxy.createProxy(stateMachine, applicationContext, apiInterface);
+        Object proxy = StateMachineApiProxy.createProxy(stateMachine, applicationContext, "com.jameswushanghai.statemachine.core.StateMachineApiProxyTest$TestInterface");
         
         // 验证代理对象不为null
         assertNotNull(proxy);
         
-        // 验证代理对象实现了DemoStateMachine接口
-        assertTrue(proxy instanceof com.jameswushanghai.statemachine.api.DemoStateMachine);
+        // 验证代理对象实现了TestInterface接口
+        assertTrue(proxy instanceof TestInterface);
         
         // 验证代理对象的方法调用
-        com.jameswushanghai.statemachine.api.DemoStateMachine demoProxy = 
-            (com.jameswushanghai.statemachine.api.DemoStateMachine) proxy;
-        com.jameswushanghai.statemachine.api.DemoStateMachine result = demoProxy.start();
-        
-        // 验证链式调用返回了自身
-        assertSame(proxy, result);
+        TestInterface testProxy = (TestInterface) proxy;
+        testProxy.testMethod();
         
         // 验证状态机execute方法被调用
-        verify(stateMachine).execute(eq("start"), any(Context.class));
+        verify(stateMachine).execute(eq("testMethod"), any(Context.class));
     }
 
     /**

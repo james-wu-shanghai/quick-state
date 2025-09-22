@@ -1,15 +1,14 @@
 package com.jameswushanghai.statemachine.core;
 
-import com.jameswushanghai.statemachine.model.StateMachineConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 /**
  * 状态机API代理类
@@ -92,6 +91,13 @@ public class StateMachineApiProxy implements InvocationHandler {
         // 如果是Object类的方法，直接调用
         if (method.getDeclaringClass() == Object.class) {
             return method.invoke(this, args);
+        }
+        
+        // 检查方法是否是从StateMachine接口继承的
+        if (StateMachine.class.isAssignableFrom(method.getDeclaringClass())) {
+            // 直接调用stateMachine对象的相应方法
+            log.debug("调用StateMachine接口方法: {}", method.getName());
+            return method.invoke(stateMachine, args);
         }
         
         // 获取方法名作为动作名

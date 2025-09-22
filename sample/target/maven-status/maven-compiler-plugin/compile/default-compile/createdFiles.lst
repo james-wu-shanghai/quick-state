@@ -1,4 +1,6 @@
 com\jameswushanghai\statemachine\action\StartAction.class
+com\jameswushanghai\statemachine\action\CompleteAction.class
 com\jameswushanghai\statemachine\action\RetryAction.class
+com\jameswushanghai\statemachine\action\ProcessAction.class
 com\jameswushanghai\statemachine\StateMachineApplication.class
 com\jameswushanghai\statemachine\api\DemoStateMachine.class

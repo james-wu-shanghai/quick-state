@@ -1,6 +1,8 @@
 package com.jameswushanghai.statemachine.api;
 
-public interface DemoStateMachine {
+import com.jameswushanghai.statemachine.core.StateMachine;
+
+public interface DemoStateMachine extends StateMachine {
         DemoStateMachine start();
         DemoStateMachine retry();
     }

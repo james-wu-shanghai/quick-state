@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StateMachineApiProxy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">state.machine.core</a> &gt; <a href="index.source.html" class="el_package">com.jameswushanghai.statemachine.core</a> &gt; <span class="el_source">StateMachineApiProxy.java</span></div><h1>StateMachineApiProxy.java</h1><pre class="source lang-java linenums">package com.jameswushanghai.statemachine.core;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+
+/**
+ * 状态机API代理类
+ * 用于创建状态机API接口的代理对象，将方法调用转发到对应的action
+ */
+public class StateMachineApiProxy implements InvocationHandler {
+
+<span class="fc" id="L19">    private static final Logger log = LoggerFactory.getLogger(StateMachineApiProxy.class);</span>
+    
+    // 状态机实例
+    private final StateMachine stateMachine;
+    
+    // Spring应用上下文
+    private final ApplicationContext applicationContext;
+    
+    // 上下文对象
+    private final Context context;
+    
+    // 缓存接口类
+<span class="fc" id="L31">    private static final Map&lt;String, Class&lt;?&gt;&gt; INTERFACE_CACHE = new ConcurrentHashMap&lt;&gt;();</span>
+
+    /**
+     * 构造函数
+     * @param stateMachine 状态机实例
+     * @param applicationContext Spring应用上下文
+     * @param context 上下文对象
+     */
+<span class="fc" id="L39">    public StateMachineApiProxy(StateMachine stateMachine, ApplicationContext applicationContext, Context context) {</span>
+<span class="fc" id="L40">        this.stateMachine = stateMachine;</span>
+<span class="fc" id="L41">        this.applicationContext = applicationContext;</span>
+<span class="fc" id="L42">        this.context = context;</span>
+<span class="fc" id="L43">    }</span>
+
+    /**
+     * 创建API代理对象
+     * @param stateMachine 状态机实例
+     * @param applicationContext Spring应用上下文
+     * @param apiInterface API接口类名
+     * @return 代理对象
+     * @throws Exception 创建异常
+     */
+    public static Object createProxy(StateMachine stateMachine, ApplicationContext applicationContext, String apiInterface) throws Exception {
+<span class="fc bfc" id="L54" title="All 4 branches covered.">        if (apiInterface == null || apiInterface.isEmpty()) {</span>
+<span class="fc" id="L55">            return stateMachine;</span>
+        }
+        
+        // 加载接口类
+<span class="fc" id="L59">        Class&lt;?&gt; interfaceClass = loadInterfaceClass(apiInterface);</span>
+        
+        // 创建上下文对象
+<span class="fc" id="L62">        Context context = new Context();</span>
+        
+        // 创建代理对象
+<span class="fc" id="L65">        StateMachineApiProxy handler = new StateMachineApiProxy(stateMachine, applicationContext, context);</span>
+<span class="fc" id="L66">        return Proxy.newProxyInstance(</span>
+<span class="fc" id="L67">                interfaceClass.getClassLoader(),</span>
+                new Class&lt;?&gt;[]{interfaceClass}, 
+                handler
+        );
+    }
+
+    /**
+     * 加载接口类
+     * @param apiInterface 接口类名
+     * @return 接口类
+     * @throws ClassNotFoundException 类未找到异常
+     */
+    private static Class&lt;?&gt; loadInterfaceClass(String apiInterface) throws ClassNotFoundException {
+<span class="fc" id="L80">        return INTERFACE_CACHE.computeIfAbsent(apiInterface, className -&gt; {</span>
+            try {
+<span class="fc" id="L82">                return Class.forName(className);</span>
+<span class="fc" id="L83">            } catch (ClassNotFoundException e) {</span>
+<span class="fc" id="L84">                throw new RuntimeException(&quot;无法加载API接口类: &quot; + className, e);</span>
+            }
+        });
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // 如果是Object类的方法，直接调用
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (method.getDeclaringClass() == Object.class) {</span>
+<span class="fc" id="L93">            return method.invoke(this, args);</span>
+        }
+        
+        // 检查方法是否是从StateMachine接口继承的
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if (StateMachine.class.isAssignableFrom(method.getDeclaringClass())) {</span>
+            // 直接调用stateMachine对象的相应方法
+<span class="nc" id="L99">            log.debug(&quot;调用StateMachine接口方法: {}&quot;, method.getName());</span>
+<span class="nc" id="L100">            return method.invoke(stateMachine, args);</span>
+        }
+        
+        // 获取方法名作为动作名
+<span class="fc" id="L104">        String actionName = method.getName();</span>
+<span class="fc" id="L105">        log.debug(&quot;调用状态机API方法: {}&quot;, actionName);</span>
+        
+        // 如果状态机未初始化，抛出异常
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        if (stateMachine.getCurrentState() == null) {</span>
+<span class="fc" id="L109">            throw new IllegalStateException(&quot;状态机未初始化，请先调用initialize方法&quot;);</span>
+        }
+        
+        // 执行动作
+<span class="fc" id="L113">        String nextState = stateMachine.execute(actionName, context);</span>
+<span class="fc" id="L114">        log.debug(&quot;状态机从[{}]转换到[{}]&quot;, stateMachine.getCurrentState(), nextState);</span>
+        
+        // 返回代理对象自身以支持链式调用
+<span class="fc" id="L117">        return proxy;</span>
+    }
+    
+    /**
+     * 获取内部的状态机实例
+     * @return 状态机实例
+     */
+    public StateMachine getStateMachine() {
+<span class="fc" id="L125">        return stateMachine;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

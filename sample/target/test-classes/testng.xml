@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Sample Module Tests" verbose="1">
+    <test name="Sample Tests">
+        <classes>
+            <class name="com.jameswushanghai.statemachine.action.StartActionTest"/>
+            <class name="com.jameswushanghai.statemachine.action.ProcessActionTest"/>
+            <class name="com.jameswushanghai.statemachine.action.RetryActionTest"/>
+            <class name="com.jameswushanghai.statemachine.action.CompleteActionTest"/>
+            <class name="com.jameswushanghai.statemachine.StateMachineApplicationTest"/>
+        </classes>
+    </test>
+</suite>

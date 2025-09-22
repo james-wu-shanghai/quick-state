@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.ApplicationContext;
 
@@ -377,6 +378,127 @@ public class DefaultStateMachineTest {
         String resultState = stateMachine.execute(actionName, context);
         assertEquals(currentState, resultState); // 状态不变
         assertEquals(currentState, stateMachine.getCurrentState());
+    }
+
+    @Test
+    public void testExecuteWithAutoMoveForward() throws Exception {
+        // 测试autoMoveForward功能
+        String initialState = "INITIAL";
+        String firstActionName = "START";
+        String firstRespCode = "SUCCESS";
+        String middleState = "PROCESSING";
+        String secondActionName = "PROCESS";
+        String secondRespCode = "DONE";
+        String finalState = "COMPLETED";
+
+        stateMachine.initialize(initialState);
+
+        // 配置第一个状态和动作
+        when(mockStateMachineConfig.getState(initialState)).thenReturn(mockStateConfig);
+        when(mockStateConfig.findAction(firstActionName)).thenReturn(mockActionConfig);
+        when(mockActionConfig.getRef()).thenReturn("startAction");
+        when(applicationContext.getBean("startAction", Action.class)).thenReturn(mockAction);
+        when(mockAction.doAction(context)).thenReturn(firstRespCode);
+        
+        // 配置autoMoveForward为true
+        when(mockActionConfig.isAutoMoveForward()).thenReturn(true);
+
+        // 配置第一个动作的下一个状态
+        NextState firstNextState = new NextState();
+        firstNextState.setRespCode(firstRespCode);
+        firstNextState.setState(middleState);
+        List<NextState> firstNextStates = new ArrayList<>();
+        firstNextStates.add(firstNextState);
+        when(mockActionConfig.getNextStates()).thenReturn(firstNextStates);
+
+        // 创建并配置第二个状态和动作
+        StateConfig middleStateConfig = new StateConfig();
+        middleStateConfig.setName(middleState);
+        ActionConfig secondActionConfig = new ActionConfig();
+        secondActionConfig.setName(secondActionName);
+        secondActionConfig.setRef("processAction");
+        middleStateConfig.setActions(new ArrayList<>());
+        middleStateConfig.getActions().add(secondActionConfig);
+        
+        // 配置第二个动作的mock
+        Action secondMockAction = Mockito.mock(Action.class);
+        when(applicationContext.getBean("processAction", Action.class)).thenReturn(secondMockAction);
+        when(secondMockAction.doAction(context)).thenReturn(secondRespCode);
+
+        // 配置第二个动作的下一个状态
+        NextState secondNextState = new NextState();
+        secondNextState.setRespCode(secondRespCode);
+        secondNextState.setState(finalState);
+        List<NextState> secondNextStates = new ArrayList<>();
+        secondNextStates.add(secondNextState);
+        secondActionConfig.setNextStates(secondNextStates);
+
+        // 配置mockStateMachineConfig返回中间状态配置
+        when(mockStateMachineConfig.getState(middleState)).thenReturn(middleStateConfig);
+
+        // 执行第一个动作，应该自动执行第二个动作
+        String resultState = stateMachine.execute(firstActionName, context);
+
+        // 验证结果 - 最终状态应该是finalState
+        assertEquals(finalState, resultState);
+        assertEquals(finalState, stateMachine.getCurrentState());
+        
+        // 验证两个动作都被执行了
+        verify(mockAction).doAction(context);
+        verify(secondMockAction).doAction(context);
+    }
+
+    @Test
+    public void testExecuteWithAutoMoveForwardButMultipleActions() throws Exception {
+        // 测试autoMoveForward为true但下一个状态有多个动作的情况
+        String initialState = "INITIAL";
+        String firstActionName = "START";
+        String firstRespCode = "SUCCESS";
+        String middleState = "PROCESSING";
+
+        stateMachine.initialize(initialState);
+
+        // 配置第一个状态和动作
+        when(mockStateMachineConfig.getState(initialState)).thenReturn(mockStateConfig);
+        when(mockStateConfig.findAction(firstActionName)).thenReturn(mockActionConfig);
+        when(mockActionConfig.getRef()).thenReturn("startAction");
+        when(applicationContext.getBean("startAction", Action.class)).thenReturn(mockAction);
+        when(mockAction.doAction(context)).thenReturn(firstRespCode);
+        
+        // 配置autoMoveForward为true
+        when(mockActionConfig.isAutoMoveForward()).thenReturn(true);
+
+        // 配置第一个动作的下一个状态
+        NextState firstNextState = new NextState();
+        firstNextState.setRespCode(firstRespCode);
+        firstNextState.setState(middleState);
+        List<NextState> firstNextStates = new ArrayList<>();
+        firstNextStates.add(firstNextState);
+        when(mockActionConfig.getNextStates()).thenReturn(firstNextStates);
+
+        // 创建并配置中间状态，包含多个动作
+        StateConfig middleStateConfig = new StateConfig();
+        middleStateConfig.setName(middleState);
+        ActionConfig secondActionConfig1 = new ActionConfig();
+        secondActionConfig1.setName("PROCESS1");
+        ActionConfig secondActionConfig2 = new ActionConfig();
+        secondActionConfig2.setName("PROCESS2");
+        middleStateConfig.setActions(new ArrayList<>());
+        middleStateConfig.getActions().add(secondActionConfig1);
+        middleStateConfig.getActions().add(secondActionConfig2);
+
+        // 配置mockStateMachineConfig返回中间状态配置
+        when(mockStateMachineConfig.getState(middleState)).thenReturn(middleStateConfig);
+
+        // 执行第一个动作，由于下一个状态有多个动作，不应该自动执行
+        String resultState = stateMachine.execute(firstActionName, context);
+
+        // 验证结果 - 最终状态应该是middleState
+        assertEquals(middleState, resultState);
+        assertEquals(middleState, stateMachine.getCurrentState());
+        
+        // 验证只有第一个动作被执行
+        verify(mockAction).doAction(context);
     }
 
 }

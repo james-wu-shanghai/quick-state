@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DefaultStateMachine.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">state.machine.core</a> &gt; <a href="index.source.html" class="el_package">com.jameswushanghai.statemachine.core</a> &gt; <span class="el_source">DefaultStateMachine.java</span></div><h1>DefaultStateMachine.java</h1><pre class="source lang-java linenums">package com.jameswushanghai.statemachine.core;
+
+import com.jameswushanghai.statemachine.model.StateMachineConfig;
+import com.jameswushanghai.statemachine.model.StateConfig;
+import com.jameswushanghai.statemachine.model.ActionConfig;
+import com.jameswushanghai.statemachine.model.NextState;
+import org.springframework.context.ApplicationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * 默认状态机实现
+ * 实现StateMachine接口的基本功能
+ */
+public class DefaultStateMachine implements StateMachine {
+
+<span class="nc" id="L17">    private static final Logger log = LoggerFactory.getLogger(DefaultStateMachine.class);</span>
+    
+    // 状态机名称
+    private String name;
+    
+    // 当前状态
+    private String currentState;
+    
+    // 状态机配置
+    private StateMachineConfig config;
+    
+    // Spring上下文，用于获取动作实例
+    private ApplicationContext applicationContext;
+    
+    /**
+     * 构造函数
+     * @param config 状态机配置
+     * @param applicationContext Spring上下文
+     */
+<span class="nc" id="L36">    public DefaultStateMachine(StateMachineConfig config, ApplicationContext applicationContext) {</span>
+<span class="nc" id="L37">        this.config = config;</span>
+<span class="nc" id="L38">        this.name = config.getName();</span>
+<span class="nc" id="L39">        this.applicationContext = applicationContext;</span>
+<span class="nc" id="L40">    }</span>
+
+    // Getter and Setter for name
+    public void setName(String name) {
+<span class="nc" id="L44">        this.name = name;</span>
+<span class="nc" id="L45">    }</span>
+
+    // Getter and Setter for config
+    public StateMachineConfig getConfig() {
+<span class="nc" id="L49">        return config;</span>
+    }
+
+    public void setConfig(StateMachineConfig config) {
+<span class="nc" id="L53">        this.config = config;</span>
+<span class="nc" id="L54">    }</span>
+
+    // Getter and Setter for applicationContext
+    public ApplicationContext getApplicationContext() {
+<span class="nc" id="L58">        return applicationContext;</span>
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) {
+<span class="nc" id="L62">        this.applicationContext = applicationContext;</span>
+<span class="nc" id="L63">    }</span>
+
+    // Setter for currentState
+    public void setCurrentState(String currentState) {
+<span class="nc" id="L67">        this.currentState = currentState;</span>
+<span class="nc" id="L68">    }</span>
+    
+    @Override
+    public String getName() {
+<span class="nc" id="L72">        return name;</span>
+    }
+    
+    @Override
+    public String getCurrentState() {
+<span class="nc" id="L77">        return currentState;</span>
+    }
+    
+    @Override
+    public String execute(String actionName, Context context) throws Exception {
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (currentState == null) {</span>
+<span class="nc" id="L83">            throw new IllegalStateException(&quot;状态机未初始化，请先调用initialize方法&quot;);</span>
+        }
+        
+        // 获取当前状态配置
+<span class="nc" id="L87">        StateConfig stateConfig = config.getState(currentState);</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (stateConfig == null) {</span>
+<span class="nc" id="L89">            throw new IllegalStateException(&quot;无效的当前状态: &quot; + currentState);</span>
+        }
+        
+        // 查找动作配置
+<span class="nc" id="L93">        ActionConfig actionConfig = stateConfig.findAction(actionName);</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        if (actionConfig == null) {</span>
+<span class="nc" id="L95">            throw new IllegalArgumentException(&quot;在状态&quot; + currentState + &quot;中找不到动作: &quot; + actionName);</span>
+        }
+        
+        // 获取动作实例
+<span class="nc" id="L99">        Action action = getAction(actionConfig.getRef());</span>
+        
+        // 执行动作并获取响应码
+<span class="nc" id="L102">        String respCode = action.doAction(context);</span>
+<span class="nc" id="L103">        log.debug(&quot;状态机[{}]在状态[{}]执行动作[{}]，响应码: {}&quot;, name, currentState, actionName, respCode);</span>
+        
+        // 查找下一个状态
+<span class="nc" id="L106">        NextState nextState = findNextState(actionConfig, respCode);</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        if (nextState != null) {</span>
+            // 更新当前状态
+<span class="nc" id="L109">            String oldState = currentState;</span>
+<span class="nc" id="L110">            currentState = nextState.getState();</span>
+<span class="nc" id="L111">            log.debug(&quot;状态机[{}]从状态[{}]转换到状态[{}]&quot;, name, oldState, currentState);</span>
+            
+            // 检查是否需要自动执行下一个状态的动作
+<span class="nc bnc" id="L114" title="All 2 branches missed.">            if (actionConfig.isAutoMoveForward()) {</span>
+                // 获取下一个状态的配置
+<span class="nc" id="L116">                StateConfig nextStateConfig = config.getState(currentState);</span>
+<span class="nc bnc" id="L117" title="All 6 branches missed.">                if (nextStateConfig != null &amp;&amp; nextStateConfig.getActions() != null &amp;&amp; nextStateConfig.getActions().size() == 1) {</span>
+                    // 只有一个动作，自动执行
+<span class="nc" id="L119">                    ActionConfig nextActionConfig = nextStateConfig.getActions().get(0);</span>
+<span class="nc" id="L120">                    log.debug(&quot;状态机[{}]在状态[{}]自动执行动作[{}]&quot;, name, currentState, nextActionConfig.getName());</span>
+                    
+                    // 递归调用execute方法执行下一个动作
+<span class="nc" id="L123">                    return execute(nextActionConfig.getName(), context);</span>
+                }
+            }
+        }
+        
+<span class="nc" id="L128">        return currentState;</span>
+    }
+    
+    @Override
+    public void initialize(String initialState) {
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (!config.containsState(initialState)) {</span>
+<span class="nc" id="L134">            throw new IllegalArgumentException(&quot;无效的初始状态: &quot; + initialState);</span>
+        }
+        
+<span class="nc" id="L137">        this.currentState = initialState;</span>
+<span class="nc" id="L138">        log.debug(&quot;状态机[{}]初始化，初始状态: {}&quot;, name, initialState);</span>
+<span class="nc" id="L139">    }</span>
+    
+    @Override
+    public boolean isFinalState() {
+        // 简单实现：检查当前状态是否没有任何动作
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        if (currentState == null) {</span>
+<span class="nc" id="L145">            return false;</span>
+        }
+        
+<span class="nc" id="L148">        StateConfig stateConfig = config.getState(currentState);</span>
+<span class="nc bnc" id="L149" title="All 4 branches missed.">        return stateConfig == null || !stateConfig.hasActions();</span>
+    }
+    
+    /**
+     * 从Spring上下文中获取动作实例
+     * @param beanName Spring bean名称
+     * @return 动作实例
+     */
+    private Action getAction(String beanName) {
+<span class="nc bnc" id="L158" title="All 2 branches missed.">        if (applicationContext == null) {</span>
+<span class="nc" id="L159">            throw new IllegalStateException(&quot;Spring上下文未设置，无法获取动作实例&quot;);</span>
+        }
+        
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        if (!applicationContext.containsBean(beanName)) {</span>
+<span class="nc" id="L163">            throw new IllegalArgumentException(&quot;找不到动作的Spring bean: &quot; + beanName);</span>
+        }
+        
+<span class="nc" id="L166">        return applicationContext.getBean(beanName, Action.class);</span>
+    }
+    
+    /**
+     * 根据响应码查找下一个状态
+     * @param actionConfig 动作配置
+     * @param respCode 响应码
+     * @return 下一个状态配置
+     */
+    private NextState findNextState(ActionConfig actionConfig, String respCode) {
+<span class="nc bnc" id="L176" title="All 4 branches missed.">        if (actionConfig.getNextStates() == null || actionConfig.getNextStates().isEmpty()) {</span>
+<span class="nc" id="L177">            return null;</span>
+        }
+        
+<span class="nc bnc" id="L180" title="All 2 branches missed.">        for (NextState nextState : actionConfig.getNextStates()) {</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">            if (respCode.equals(nextState.getRespCode())) {</span>
+<span class="nc" id="L182">                return nextState;</span>
+            }
+<span class="nc" id="L184">        }</span>
+        
+<span class="nc" id="L186">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

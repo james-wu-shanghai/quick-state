@@ -109,6 +109,20 @@ public class DefaultStateMachine implements StateMachine {
             String oldState = currentState;
             currentState = nextState.getState();
             log.debug("状态机[{}]从状态[{}]转换到状态[{}]", name, oldState, currentState);
+            
+            // 检查是否需要自动执行下一个状态的动作
+            if (actionConfig.isAutoMoveForward()) {
+                // 获取下一个状态的配置
+                StateConfig nextStateConfig = config.getState(currentState);
+                if (nextStateConfig != null && nextStateConfig.getActions() != null && nextStateConfig.getActions().size() == 1) {
+                    // 只有一个动作，自动执行
+                    ActionConfig nextActionConfig = nextStateConfig.getActions().get(0);
+                    log.debug("状态机[{}]在状态[{}]自动执行动作[{}]", name, currentState, nextActionConfig.getName());
+                    
+                    // 递归调用execute方法执行下一个动作
+                    return execute(nextActionConfig.getName(), context);
+                }
+            }
         }
         
         return currentState;
