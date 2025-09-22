@@ -16,12 +16,17 @@ quick-state/
 │       │   ├── java/    # Java源码
 │       │   └── resources/ # 配置资源文件
 │       └── test/        # 测试代码
+├── sample/              # 示例模块，包含状态机使用示例
+│   ├── pom.xml          # 示例模块的POM文件
+│   └── src/
+│       └── main/        # 主要源代码和配置
 └── req/                 # 需求文档目录
     ├── 001_init         # 初始需求文档
     ├── 002_state_machine # 状态机核心功能需求
     ├── 003_add_state_machine_testcase # 测试用例需求
     ├── 004_state_machine_api # API需求
-    └── 005_convert2modeule # 模块化需求
+    ├── 005_convert2modeule # 模块化需求
+    └── 006_add_sample_module # 示例模块需求
 ```
 
 ## 模块说明
@@ -44,6 +49,15 @@ quick-state/
   - `Action`: 状态转换时执行的动作接口
   - `StateMachineConfig`: 状态机配置模型
   - `StateMachineXmlParser`: XML配置解析器
+
+### 示例模块 (sample)
+- **作用**: 提供状态机框架的使用示例，帮助开发者快速上手
+- **主要内容**: 
+  - 完整的Spring Boot应用示例
+  - 状态机API接口定义示例 (`DemoStateMachine`)
+  - 自定义动作实现示例 (`StartAction`, `RetryAction`)
+  - XML状态机配置示例 (`demo-state-machine.xml`)
+  - 状态机使用流程演示
 
 ## 功能特点
 
@@ -79,7 +93,43 @@ mvn test
 
 ## 使用示例
 
-### 创建状态机
+### 示例模块使用流程
+
+1. **构建并运行示例应用**
+   在项目根目录执行以下命令构建项目并运行示例应用：
+   
+   ```bash
+   mvn clean install
+   cd sample
+   mvn spring-boot:run
+   ```
+
+2. **示例状态机结构**
+   示例模块中定义了一个简单的状态机，包含以下状态：
+   - `INIT`: 初始状态
+   - `SUCCESS`: 成功状态
+   - `FAIL`: 失败状态
+
+3. **示例API使用**
+   示例模块提供了`DemoStateMachine`接口，通过状态机代理实现：
+   
+   ```java
+   // 注入状态机API代理
+   @Autowired
+   private DemoStateMachine demoStateMachine;
+   
+   // 创建上下文并设置数据
+   Context context = new Context();
+   context.put("inputData", "test data");
+   
+   // 调用状态机API执行操作
+   String result = demoStateMachine.process(context);
+   System.out.println("状态机执行结果: " + result);
+   ```
+
+### 核心模块使用示例
+
+#### 创建状态机
 
 ```java
 // 从XML配置文件创建状态机
@@ -96,10 +146,33 @@ stateMachine.fireEvent("EVENT_NAME", context);
 String newState = stateMachine.getCurrentState();
 ```
 
+#### 定义自定义动作
+
+```java
+public class CustomAction implements Action {
+    @Override
+    public String doAction(Context context) {
+        // 执行自定义业务逻辑
+        String input = context.get("inputKey", String.class);
+        // 处理数据
+        String result = processInput(input);
+        // 设置结果到上下文
+        context.put("resultKey", result);
+        // 返回状态转换的响应代码
+        return "SUCCESS_CODE";
+    }
+    
+    private String processInput(String input) {
+        // 实现具体的业务逻辑
+        return "processed_" + input;
+    }
+}```
+
 ## 注意事项
 - 确保所有状态机配置文件放在 `resources/statemachine/` 目录下
 - 自定义动作需要实现 `Action` 接口
 - 状态和事件名称必须与配置文件中定义的一致
+- 示例模块依赖core模块，请确保core模块已成功构建
 
 ## 未来规划
 - 添加更多配置方式（如注解、DSL等）

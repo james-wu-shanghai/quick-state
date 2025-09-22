@@ -2,12 +2,11 @@ D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\core\Cont
 D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\config\StateMachineConfigurer.java
 D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\core\StateMachineApiProxy.java
 D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\core\StateMachineFactory.java
-D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\Application.java
+D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\model\StateMachineConfig.java
 D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\model\StateConfig.java
 D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\model\NextState.java
 D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\parser\StateMachineXmlParser.java
 D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\core\Action.java
 D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\core\DefaultStateMachine.java
 D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\core\StateMachine.java
-D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\model\StateMachineConfig.java
 D:\git\quick-state\core\src\main\java\com\jameswushanghai\statemachine\model\ActionConfig.java

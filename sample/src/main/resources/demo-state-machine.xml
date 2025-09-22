@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    状态机配置文件
+    定义了演示状态机的结构、状态、动作和转换规则
+-->
+<state-machine name="demoMachine">
+    <!-- 指定状态机的API接口 -->
+    <api>com.jameswushanghai.statemachine.api.DemoStateMachine</api>
+    
+    <!-- 定义初始状态 -->
+    <state name="INIT">
+        <!-- 在初始状态下可以执行start动作 -->
+        <action name="start" ref="startAction">
+            <!-- 根据动作返回的响应码决定下一个状态 -->
+            <next-state response="SUCCESS" state="SUCCESS"/>
+            <next-state response="FAILED" state="FAIL"/>
+        </action>
+    </state>
+    
+    <!-- 定义失败状态 -->
+    <state name="FAIL">
+        <!-- 在失败状态下可以执行retry动作 -->
+        <action name="retry" ref="retryAction">
+            <!-- 重试动作总是返回SUCCESS，转换到SUCCESS状态 -->
+            <next-state response="SUCCESS" state="SUCCESS"/>
+        </action>
+    </state>
+    
+    <!-- 定义成功状态 -->
+    <state name="SUCCESS">
+        <!-- 成功状态是终态，没有定义任何动作 -->
+        <!-- 可以在这里添加清理或完成动作 -->
+    </state>
+</state-machine>

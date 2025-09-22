@@ -3,9 +3,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
+        <version>1.0.0</version>
         <groupId>com.jameswushanghai</groupId>
         <artifactId>state.machine</artifactId>
-        <version>1.0.0</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -13,7 +13,6 @@
     <packaging>jar</packaging>
 
     <dependencies>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
@@ -80,64 +79,5 @@
         </dependency>
         <!-- Mockito with TestNG support is included in mockito-core for newer versions -->
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>com.jameswushanghai.statemachine.Application</mainClass>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <release>${java.version}</release>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M9</version>
-                <configuration>
-                    <argLine>-Duser.language=zh_CN ${argLine}</argLine> <!-- 确保JaCoCo代理参数被传递 -->
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
-                    <testFailureIgnore>false</testFailureIgnore>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <!-- 覆盖 pluginManagement 中定义的版本 -->
-                <configuration>
-                    <destFile>${project.build.directory}/jacoco.exec</destFile>
-                    <dataFile>${project.build.directory}/jacoco.exec</dataFile>
-                </configuration>
-                <executions>
-                    <!-- 1. 准备 JaCoCo 运行环境 -->
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <!-- 2. 生成覆盖率报告 -->
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase> <!-- 在测试阶段后生成报告 -->
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

@@ -1,0 +1,2 @@
+接下来要新增一个名为sample的module，这个module的作用是用来存放sample的代码，基于对core module的依赖。
+然后将test中的StateMachineApplication,DemoStateMachine和StartAction移动过去，并补充xml定义和其他需要的文件，生成一个可以用来指导新手使用状态机代码的样例

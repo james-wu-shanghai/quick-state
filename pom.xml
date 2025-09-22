@@ -13,6 +13,7 @@
     <!-- 添加modules配置 -->
     <modules>
         <module>core</module>
+        <module>sample</module>
     </modules>
 
     <parent>
@@ -28,6 +29,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.version>1.0.0</project.version>
         <testng.version>7.5</testng.version>
         <slf4j.version>1.7.36</slf4j.version>
         <junit.version>4.13.2</junit.version>
@@ -92,7 +94,6 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0-M9</version>
                     <configuration>
-                        <argLine>-Duser.language=zh_CN ${argLine}</argLine> <!-- 确保JaCoCo代理参数被传递 -->
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
@@ -100,31 +101,24 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.11</version> <!-- Updated version that supports Java 17 -->
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>2.7</version>
                     <configuration>
-                        <destFile>${project.build.directory}/jacoco.exec</destFile>
-                        <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                        <formats>
+                        <format>html</format>
+                        <format>xml</format>
+                        </formats>
                     </configuration>
                     <executions>
-                        <!-- 1. 准备 JaCoCo 运行环境 -->
                         <execution>
-                            <id>prepare-agent</id>
-                            <goals>
-                                <goal>prepare-agent</goal>
-                            </goals>
-                        </execution>
-                        <!-- 2. 生成覆盖率报告 -->
-                        <execution>
-                            <id>report</id>
-                            <phase>test</phase> <!-- 在测试阶段后生成报告 -->
-                            <goals>
-                                <goal>report</goal>
-                            </goals>
+                        <goals>
+                            <goal>clean</goal>
+                            <goal>cobertura</goal>
+                        </goals>
                         </execution>
                     </executions>
-                </plugin>
+                    </plugin>
             </plugins>
         </pluginManagement>
     </build>
