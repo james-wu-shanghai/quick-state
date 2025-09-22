@@ -1,67 +1,69 @@
-# State Machine Sample Module
+# Quick-State Sample Module
 
-本模块提供了一个基于core模块的状态机使用示例，旨在指导新手如何使用状态机框架。
+## Module Introduction
 
-## 模块结构
+This module provides a complete example of using the Quick-State framework based on the core module. It aims to guide new developers on how to use the state machine framework effectively.
+
+## Module Structure
 
 ```
 src/main/java/com/jameswushanghai/statemachine/
-├── StateMachineApplication.java  # 应用程序入口
+├── StateMachineApplication.java  # Application entry point
 ├── api/
-│   └── DemoStateMachine.java     # 状态机API接口
+│   └── DemoStateMachine.java     # State machine API interface
 └── action/
-    ├── StartAction.java          # 开始动作实现
-    └── RetryAction.java          # 重试动作实现
+    ├── StartAction.java          # Start action implementation
+    └── RetryAction.java          # Retry action implementation
 src/main/resources/
-├── demo-state-machine.xml        # 状态机XML配置
-└── application.properties        # Spring Boot配置
+├── demo-state-machine.xml        # State machine XML configuration
+└── application.properties        # Spring Boot configuration
 ```
 
-## 功能说明
+## Features
 
-1. **DemoStateMachine接口**：定义了状态机的两个操作方法：start()和retry()
+1. **DemoStateMachine Interface**: Defines two operation methods for the state machine: start() and retry()
 
-2. **StartAction类**：实现了start动作的逻辑，第一次执行返回失败，第二次返回成功
+2. **StartAction Class**: Implements the logic for the start action, returns failure on first execution and success on second execution
 
-3. **RetryAction类**：实现了retry动作的逻辑，记录重试次数并返回成功
+3. **RetryAction Class**: Implements the logic for the retry action, records retry count and returns success
 
-4. **StateMachineApplication类**：Spring Boot应用程序入口，演示了如何创建和使用状态机
+4. **StateMachineApplication Class**: Spring Boot application entry point that demonstrates how to create and use state machines
 
-5. **XML配置文件**：定义了状态机的结构、状态、动作和转换规则
+5. **XML Configuration File**: Defines the state machine structure, states, actions, and transition rules
 
-## 状态机流程
+## State Machine Flow
 
-- **初始状态(INIT)**：可以执行start动作
-  - 执行成功：转换到SUCCESS状态
-  - 执行失败：转换到FAIL状态
-- **失败状态(FAIL)**：可以执行retry动作
-  - 执行成功：转换到SUCCESS状态
-- **成功状态(SUCCESS)**：终态，没有定义任何动作
+- **Initial State (INIT)**: Can execute the start action
+  - On success: Transition to SUCCESS state
+  - On failure: Transition to FAIL state
+- **Failure State (FAIL)**: Can execute the retry action
+  - On success: Transition to SUCCESS state
+- **Success State (SUCCESS)**: Final state, no actions defined
 
-## 如何运行
+## How to Run
 
-1. 确保core模块已经构建完成
-2. 在根目录执行`mvn clean install`构建项目
-3. 运行sample模块的StateMachineApplication类
+1. Ensure the core module has been built successfully
+2. Execute `mvn clean install` in the root directory to build the project
+3. Run the StateMachineApplication class in the sample module
 
-## 使用示例
+## Usage Examples
 
 ```java
-// 从XML配置创建状态机
+// Create state machine from XML configuration
 DemoStateMachine demoStateMachine = (DemoStateMachine) stateMachineFactory.createStateMachineFromXml("classpath:demo-state-machine.xml");
 
-// 执行状态机操作（链式调用）
+// Execute state machine operations (chain call)
 demoStateMachine.start().retry();
 
-// 或者使用原始状态机接口
+// Or use the original state machine interface
 StateMachine stateMachine = stateMachineFactory.getStateMachine("demoMachine");
 stateMachine.initialize("INIT");
 Context context = new Context();
 String newState = stateMachine.execute("start", context);
 ```
 
-## 注意事项
+## Notes
 
-1. 确保正确配置XML文件中的action引用与Spring Bean名称一致
-2. 状态机名称在XML配置中定义，用于后续获取状态机实例
-3. API接口中的方法名应与XML配置中的action名称对应
+1. Ensure that the action references in the XML file are correctly configured to match the Spring Bean names
+2. The state machine name is defined in the XML configuration and is used to retrieve the state machine instance later
+3. The method names in the API interface should correspond to the action names in the XML configuration
