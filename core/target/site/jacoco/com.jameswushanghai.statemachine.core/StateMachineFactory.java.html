@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StateMachineFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">state.machine.core</a> &gt; <a href="index.source.html" class="el_package">com.jameswushanghai.statemachine.core</a> &gt; <span class="el_source">StateMachineFactory.java</span></div><h1>StateMachineFactory.java</h1><pre class="source lang-java linenums">package com.jameswushanghai.statemachine.core;
+
+import com.jameswushanghai.statemachine.model.StateMachineConfig;
+import com.jameswushanghai.statemachine.parser.StateMachineXmlParser;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 状态机工厂
+ * 用于创建和管理状态机实例
+ */
+@Component
+<span class="nc" id="L25">public class StateMachineFactory implements InitializingBean {</span>
+
+<span class="fc" id="L27">    private static final Logger log = LoggerFactory.getLogger(StateMachineFactory.class);</span>
+    
+    @Autowired
+    private ApplicationContext applicationContext;
+    
+    @Autowired
+    private ResourceLoader resourceLoader;
+    
+    // 存储已创建的状态机实例
+<span class="nc" id="L36">    private final Map&lt;String, StateMachine&gt; stateMachines = new HashMap&lt;&gt;();</span>
+    
+    // XML解析器
+<span class="nc" id="L39">    private final StateMachineXmlParser parser = new StateMachineXmlParser();</span>
+    
+    /**
+     * 根据名称获取状态机实例
+     * @param name 状态机名称
+     * @return 状态机实例
+     */
+    public StateMachine getStateMachine(String name) {
+<span class="nc" id="L47">        StateMachine stateMachine = stateMachines.get(name);</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if (stateMachine == null) {</span>
+<span class="nc" id="L49">            throw new IllegalArgumentException(&quot;找不到状态机: &quot; + name);</span>
+        }
+<span class="nc" id="L51">        return stateMachine;</span>
+    }
+    
+    /**
+     * 根据名称获取状态机API代理对象
+     * @param name 状态机名称
+     * @param apiType API接口类型
+     * @param &lt;T&gt; 泛型类型
+     * @return API代理对象
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public &lt;T&gt; T getStateMachineApi(String name, Class&lt;T&gt; apiType) {
+<span class="nc" id="L63">        StateMachine stateMachine = getStateMachine(name);</span>
+<span class="nc" id="L64">        StateMachineConfig config = ((DefaultStateMachine) stateMachine).getConfig();</span>
+        
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if (apiType == null) {</span>
+<span class="nc" id="L67">            throw new IllegalArgumentException(&quot;API接口类型不能为空&quot;);</span>
+        }
+        
+<span class="nc" id="L70">        String apiInterface = config.getApiInterface();</span>
+<span class="nc bnc" id="L71" title="All 4 branches missed.">        if (apiInterface == null || !apiInterface.equals(apiType.getName())) {</span>
+<span class="nc" id="L72">            throw new IllegalArgumentException(&quot;状态机[&quot; + name + &quot;]的API接口类型不匹配&quot;);</span>
+        }
+        
+        try {
+<span class="nc" id="L76">            return (T) StateMachineApiProxy.createProxy(stateMachine, applicationContext, apiInterface);</span>
+<span class="nc" id="L77">        } catch (Exception e) {</span>
+<span class="nc" id="L78">            log.error(&quot;创建状态机API代理失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L79">            throw new RuntimeException(&quot;创建状态机API代理失败&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * 从XML文件创建状态机
+     * @param configLocation XML配置文件路径
+     * @return 状态机实例或API代理对象
+     * @throws Exception 创建异常
+     */
+    public Object createStateMachineFromXml(String configLocation) throws Exception {
+        try {
+<span class="nc" id="L91">            Resource resource = resourceLoader.getResource(configLocation);</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">            if (!resource.exists()) {</span>
+<span class="nc" id="L93">                throw new IOException(&quot;配置文件不存在: &quot; + configLocation);</span>
+            }
+            
+<span class="nc" id="L96">            StateMachineConfig config = parser.parseFromInputStream(resource.getInputStream());</span>
+<span class="nc" id="L97">            return createStateMachine(config);</span>
+<span class="nc" id="L98">        } catch (Exception e) {</span>
+<span class="nc" id="L99">            log.error(&quot;从XML文件创建状态机失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L100">            throw e;</span>
+        }
+    }
+    
+    /**
+     * 从XML文件创建状态机并返回StateMachine接口
+     * @param configLocation XML配置文件路径
+     * @return StateMachine接口实例
+     * @throws Exception 创建异常
+     */
+    public StateMachine createStateMachineInterfaceFromXml(String configLocation) throws Exception {
+<span class="nc" id="L111">        Object machine = createStateMachineFromXml(configLocation);</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">        if (machine instanceof StateMachine) {</span>
+<span class="nc" id="L113">            return (StateMachine) machine;</span>
+        }
+        // 如果返回的是代理对象，从内部获取StateMachine实例
+<span class="nc" id="L116">        return ((StateMachineApiProxy)Proxy.getInvocationHandler(machine)).getStateMachine();</span>
+    }
+    
+    /**
+     * 从XML字符串创建状态机
+     * @param xmlString XML配置字符串
+     * @return 状态机实例或API代理对象
+     * @throws Exception 创建异常
+     */
+    public Object createStateMachineFromXmlString(String xmlString) throws Exception {
+        try {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">            if (!StringUtils.hasText(xmlString)) {</span>
+<span class="nc" id="L128">                throw new IllegalArgumentException(&quot;XML字符串不能为空&quot;);</span>
+            }
+            
+<span class="nc" id="L131">            StateMachineConfig config = parser.parseFromString(xmlString);</span>
+<span class="nc" id="L132">            return createStateMachine(config);</span>
+<span class="nc" id="L133">        } catch (Exception e) {</span>
+<span class="nc" id="L134">            log.error(&quot;从XML字符串创建状态机失败: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L135">            throw e;</span>
+        }
+    }
+    
+    /**
+     * 从XML字符串创建状态机并返回StateMachine接口
+     * @param xmlString XML配置字符串
+     * @return StateMachine接口实例
+     * @throws Exception 创建异常
+     */
+    public StateMachine createStateMachineInterfaceFromXmlString(String xmlString) throws Exception {
+<span class="nc" id="L146">        Object machine = createStateMachineFromXmlString(xmlString);</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        if (machine instanceof StateMachine) {</span>
+<span class="nc" id="L148">            return (StateMachine) machine;</span>
+        }
+        // 如果返回的是代理对象，从内部获取StateMachine实例
+<span class="nc" id="L151">        return ((StateMachineApiProxy)Proxy.getInvocationHandler(machine)).getStateMachine();</span>
+    }
+    
+    /**
+     * 根据配置创建状态机
+     * @param config 状态机配置
+     * @return 状态机实例或API代理对象
+     */
+    private Object createStateMachine(StateMachineConfig config) {
+<span class="nc" id="L160">        DefaultStateMachine stateMachine = new DefaultStateMachine(config, applicationContext);</span>
+<span class="nc" id="L161">        stateMachines.put(config.getName(), stateMachine);</span>
+<span class="nc" id="L162">        log.info(&quot;成功创建状态机[{}]，包含{}个状态&quot;, config.getName(), config.getStateCount());</span>
+        
+        // 如果配置了API接口，返回代理对象
+<span class="nc" id="L165">        String apiInterface = config.getApiInterface();</span>
+<span class="nc bnc" id="L166" title="All 4 branches missed.">        if (apiInterface != null &amp;&amp; !apiInterface.isEmpty()) {</span>
+            try {
+<span class="nc" id="L168">                return StateMachineApiProxy.createProxy(stateMachine, applicationContext, apiInterface);</span>
+<span class="nc" id="L169">            } catch (Exception e) {</span>
+<span class="nc" id="L170">                log.error(&quot;创建状态机API代理失败: {}&quot;, e.getMessage(), e);</span>
+                // 如果创建代理失败，返回原始状态机
+<span class="nc" id="L172">                return stateMachine;</span>
+            }
+        }
+        
+        // 否则返回原始状态机
+<span class="nc" id="L177">        return stateMachine;</span>
+    }
+    
+    /**
+     * 初始化后自动扫描并加载状态机配置
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        // 这里可以实现自动扫描和加载状态机配置的逻辑
+<span class="nc" id="L186">        log.info(&quot;状态机工厂初始化完成&quot;);</span>
+<span class="nc" id="L187">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

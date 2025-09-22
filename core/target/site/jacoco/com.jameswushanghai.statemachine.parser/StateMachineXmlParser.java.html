@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StateMachineXmlParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">state.machine.core</a> &gt; <a href="index.source.html" class="el_package">com.jameswushanghai.statemachine.parser</a> &gt; <span class="el_source">StateMachineXmlParser.java</span></div><h1>StateMachineXmlParser.java</h1><pre class="source lang-java linenums">package com.jameswushanghai.statemachine.parser;
+
+import com.jameswushanghai.statemachine.model.StateMachineConfig;
+import com.jameswushanghai.statemachine.model.StateConfig;
+import com.jameswushanghai.statemachine.model.ActionConfig;
+import com.jameswushanghai.statemachine.model.NextState;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+
+/**
+ * 状态机XML解析器
+ * 用于解析状态机的XML配置文件
+ */
+<span class="nc" id="L24">public class StateMachineXmlParser {</span>
+    
+    /**
+     * 从字符串解析状态机配置
+     * @param xmlString XML字符串
+     * @return 状态机配置对象
+     * @throws Exception 解析异常
+     */
+    public StateMachineConfig parseFromString(String xmlString) throws Exception {
+        try {
+<span class="nc" id="L34">            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</span>
+<span class="nc" id="L35">            DocumentBuilder builder = factory.newDocumentBuilder();</span>
+<span class="nc" id="L36">            Document document = builder.parse(new InputSource(new StringReader(xmlString)));</span>
+            
+<span class="nc" id="L38">            return parseDocument(document);</span>
+<span class="nc" id="L39">        } catch (SAXException | IOException e) {</span>
+<span class="nc" id="L40">            throw new Exception(&quot;解析XML字符串失败: &quot; + e.getMessage(), e);</span>
+        }
+    }
+    
+    /**
+     * 从输入流解析状态机配置
+     * @param inputStream 输入流
+     * @return 状态机配置对象
+     * @throws Exception 解析异常
+     */
+    public StateMachineConfig parseFromInputStream(InputStream inputStream) throws Exception {
+        try {
+<span class="nc" id="L52">            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</span>
+<span class="nc" id="L53">            DocumentBuilder builder = factory.newDocumentBuilder();</span>
+<span class="nc" id="L54">            Document document = builder.parse(inputStream);</span>
+            
+<span class="nc" id="L56">            return parseDocument(document);</span>
+<span class="nc" id="L57">        } catch (SAXException | IOException e) {</span>
+<span class="nc" id="L58">            throw new Exception(&quot;解析XML输入流失败: &quot; + e.getMessage(), e);</span>
+        }
+    }
+    
+    /**
+     * 解析XML文档
+     * @param document XML文档对象
+     * @return 状态机配置对象
+     */
+    private StateMachineConfig parseDocument(Document document) {
+<span class="nc" id="L68">        StateMachineConfig config = new StateMachineConfig();</span>
+        
+        // 获取根元素
+<span class="nc" id="L71">        Element root = document.getDocumentElement();</span>
+        
+        // 检查name属性是否存在，如果不存在则设置为null
+<span class="nc" id="L74">        String name = null;</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if (root.hasAttribute(&quot;name&quot;)) {</span>
+<span class="nc" id="L76">            name = root.getAttribute(&quot;name&quot;);</span>
+        }
+<span class="nc" id="L78">        config.setName(name);</span>
+        
+        // 解析API接口配置
+<span class="nc" id="L81">        NodeList apiNodes = root.getElementsByTagName(&quot;api&quot;);</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (apiNodes.getLength() &gt; 0) {</span>
+<span class="nc" id="L83">            Element apiElement = (Element) apiNodes.item(0);</span>
+<span class="nc" id="L84">            String apiInterface = null;</span>
+            
+            // 优先从元素内容中获取API接口类名
+<span class="nc bnc" id="L87" title="All 4 branches missed.">            if (apiElement.getTextContent() != null &amp;&amp; !apiElement.getTextContent().trim().isEmpty()) {</span>
+<span class="nc" id="L88">                apiInterface = apiElement.getTextContent().trim();</span>
+            }
+            // 如果元素内容为空，则从interface属性获取
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            else if (apiElement.hasAttribute(&quot;interface&quot;)) {</span>
+<span class="nc" id="L92">                apiInterface = apiElement.getAttribute(&quot;interface&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L95" title="All 4 branches missed.">            if (apiInterface != null &amp;&amp; !apiInterface.isEmpty()) {</span>
+<span class="nc" id="L96">                config.setApiInterface(apiInterface);</span>
+            }
+        }
+        
+        // 解析所有状态
+<span class="nc" id="L101">        NodeList stateNodes = root.getElementsByTagName(&quot;state&quot;);</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        for (int i = 0; i &lt; stateNodes.getLength(); i++) {</span>
+<span class="nc" id="L103">            Element stateElement = (Element) stateNodes.item(i);</span>
+<span class="nc" id="L104">            StateConfig stateConfig = parseState(stateElement);</span>
+<span class="nc" id="L105">            config.addState(stateConfig);</span>
+        }
+        
+<span class="nc" id="L108">        return config;</span>
+    }
+    
+    /**
+     * 解析状态元素
+     * @param stateElement 状态元素
+     * @return 状态配置对象
+     */
+    private StateConfig parseState(Element stateElement) {
+<span class="nc" id="L117">        StateConfig stateConfig = new StateConfig();</span>
+<span class="nc" id="L118">        String stateName = stateElement.getAttribute(&quot;name&quot;);</span>
+<span class="nc" id="L119">        stateConfig.setName(stateName);</span>
+        
+        // 解析状态下的所有动作
+<span class="nc" id="L122">        NodeList actionNodes = stateElement.getElementsByTagName(&quot;action&quot;);</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        for (int i = 0; i &lt; actionNodes.getLength(); i++) {</span>
+<span class="nc" id="L124">            Element actionElement = (Element) actionNodes.item(i);</span>
+<span class="nc" id="L125">            ActionConfig actionConfig = parseAction(actionElement);</span>
+            
+<span class="nc bnc" id="L127" title="All 2 branches missed.">            if (stateConfig.getActions() == null) {</span>
+<span class="nc" id="L128">                stateConfig.setActions(new java.util.ArrayList&lt;&gt;());</span>
+            }
+<span class="nc" id="L130">            stateConfig.getActions().add(actionConfig);</span>
+        }
+        
+<span class="nc" id="L133">        return stateConfig;</span>
+    }
+    
+    /**
+     * 解析动作元素
+     * @param actionElement 动作元素
+     * @return 动作配置对象
+     */
+    private ActionConfig parseAction(Element actionElement) {
+<span class="nc" id="L142">        ActionConfig actionConfig = new ActionConfig();</span>
+<span class="nc" id="L143">        actionConfig.setName(actionElement.getAttribute(&quot;name&quot;));</span>
+<span class="nc" id="L144">        actionConfig.setRef(actionElement.getAttribute(&quot;ref&quot;));</span>
+        
+        // 解析下一个状态
+<span class="nc" id="L147">        NodeList nextStateNodes = actionElement.getElementsByTagName(&quot;nextState&quot;);</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">        for (int i = 0; i &lt; nextStateNodes.getLength(); i++) {</span>
+<span class="nc" id="L149">            Element nextStateElement = (Element) nextStateNodes.item(i);</span>
+<span class="nc" id="L150">            NextState nextState = new NextState();</span>
+<span class="nc" id="L151">            nextState.setRespCode(nextStateElement.getAttribute(&quot;respCode&quot;));</span>
+<span class="nc" id="L152">            nextState.setState(nextStateElement.getAttribute(&quot;state&quot;));</span>
+            
+<span class="nc bnc" id="L154" title="All 2 branches missed.">            if (actionConfig.getNextStates() == null) {</span>
+<span class="nc" id="L155">                actionConfig.setNextStates(new java.util.ArrayList&lt;&gt;());</span>
+            }
+<span class="nc" id="L157">            actionConfig.getNextStates().add(nextState);</span>
+        }
+        
+<span class="nc" id="L160">        return actionConfig;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

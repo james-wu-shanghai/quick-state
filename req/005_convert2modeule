@@ -1,0 +1,3 @@
+现在要将目前src的代码转换成为maven的一个module，名字为core。这个module会有自己的maven配置。所有包版本管理放在主pom.xml中。
+目前的pom.xml为主pom.xml，需要在其中添加core module的配置。
+修改完成后，增加readme.md文件，说明真个项目的结构和每个module的作用。

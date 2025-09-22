@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StateMachineConfigurer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">state.machine.core</a> &gt; <a href="index.source.html" class="el_package">com.jameswushanghai.statemachine.config</a> &gt; <span class="el_source">StateMachineConfigurer.java</span></div><h1>StateMachineConfigurer.java</h1><pre class="source lang-java linenums">package com.jameswushanghai.statemachine.config;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * 状态机配置类
+ * 配置状态机框架的组件扫描和其他配置
+ */
+@Configuration
+@ComponentScan({
+    &quot;com.jameswushanghai.statemachine.core&quot;,
+    &quot;com.jameswushanghai.statemachine.parser&quot;,
+    &quot;com.jameswushanghai.statemachine.api&quot;
+})
+<span class="nc" id="L16">public class StateMachineConfigurer {</span>
+    
+    // 这里可以添加状态机框架的其他配置
+    // 例如：自定义的XML解析器配置、状态机工厂的高级配置等
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

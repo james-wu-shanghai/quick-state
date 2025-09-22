@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StateMachine name="channelLoanRequestStateMachine">
+	<BizInterface class="sh.wu.james.example.statemachine.BizOperations" />
+	<Payload class="sh.wu.james.example.dto.HelloworldDTO">
+		<StateEntity fieldName="state" />
+		<StatusEntity class="sh.wu.james.example.dto.HelloworldStatus"
+			fieldName="status" />
+	</Payload>
+	<StatusStateMapping>
+		<Empty state="start" />
+		<Map statusMark="MORNING" state="morning" />
+		<Map statusMark="NOON" state="noon" />
+		<Map statusMark="NIGHT" state="night" />
+		<Map statusMark="MIDNIGHT" state="end" />
+	</StatusStateMapping>
+
+	<Listeners>
+		<Listener id="createReqLsnr"
+			class="sh.wu.james.example.statemachine.listener.SleepListener" />
+		<Listener id="createReqLsnr"
+			class="sh.wu.james.example.statemachine.listener.StatusChangeListener" />
+	</Listeners>
+
+	<States>
+		<State name="start">
+			<PreProcessors />
+			<SupportMethods>
+				<SupportMethod name="wakeUp">
+					<NextStep nextStatus="MORNING">
+						<Events>
+							<Event type="statusChange" />
+							<Event type="waked" />
+						</Events>
+					</NextStep>
+				</SupportMethod>
+			</SupportMethods>
+		</State>
+
+		<State name="morning">
+			<PreProcessors />
+			<SupportMethods>
+				<SupportMethod name="eatBreakfast">
+					<NextStep nextStatus="NOON">
+						<Events>
+							<Event type="statusChange" />
+							<Event type="breakfast" />
+						</Events>
+					</NextStep>
+				</SupportMethod>
+				<SupportMethod name="sleep">
+					<NextStep nextStatus="NIGHT">
+						<Event type="statusChange" />
+					</NextStep>
+				</SupportMethod>
+			</SupportMethods>
+		</State>
+
+		<State name="noon">
+			<PreProcessors />
+			<SupportMethods>
+				<SupportMethod name="eatLunch">
+					<NextStep nextStatus="NIGHT">
+						<Events>
+							<Event type="statusChange" />
+							<Event type="lunch" />
+						</Events>
+					</NextStep>
+				</SupportMethod>
+			</SupportMethods>
+		</State>
+
+		<State name="night">
+			<PreProcessors />
+			<SupportMethods>
+				<SupportMethod name="sleep">
+					<NextStep nextStatus="MIDNIGHT">
+						<Events>
+							<Event type="statusChange" />
+							<Event type="sleeping" />
+						</Events>
+					</NextStep>
+				</SupportMethod>
+			</SupportMethods>
+		</State>
+
+		<State name="end" />
+	</States>
+</StateMachine>
