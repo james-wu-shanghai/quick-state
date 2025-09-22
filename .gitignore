@@ -27,6 +27,9 @@ dist/
 nbdist/
 .nb-gradle/
 
+# vscode
+.vscode/
+
 # OS generated files
 .DS_Store
 .DS_Store?
